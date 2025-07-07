@@ -1,0 +1,522 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header Styles */
+header {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ff88;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo:hover {
+    color: #00cc6a;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: #00ff88;
+}
+
+/* Hero Section */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="blocks" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="5" height="5" fill="%23ffffff10"/><rect x="5" y="5" width="5" height="5" fill="%23ffffff10"/></pattern></defs><rect width="100" height="100" fill="url(%23blocks)"/></svg>') repeat;
+    animation: float 20s ease-in-out infinite;
+    opacity: 0.3;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+    to { text-shadow: 0 0 30px rgba(0, 255, 136, 0.8); }
+}
+
+.hero p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.game-blocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 10px;
+    margin-top: 40px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.block {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #00ff88, #00cc6a);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    animation: blockFloat 3s ease-in-out infinite;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+}
+
+.block:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+}
+
+.block:nth-child(odd) {
+    animation-delay: 0.5s;
+}
+
+.block:nth-child(even) {
+    animation-delay: 1s;
+}
+
+@keyframes blockFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Main Content */
+.main-content {
+    background: white;
+    margin-top: 50px;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 3;
+}
+
+.section {
+    padding: 60px 0;
+}
+
+.section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #333;
+    position: relative;
+}
+
+.section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
+
+.project-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.info-card {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.info-card h3 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.info-card p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.info-card .tag {
+    background: #667eea;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-right: 10px;
+    display: inline-block;
+    margin-bottom: 5px;
+    transition: background 0.3s ease;
+}
+
+.info-card .tag:hover {
+    background: #764ba2;
+}
+
+/* Bubble Chart Section */
+.bubble-section {
+    background: #f8f9fa;
+    padding: 60px 0;
+}
+
+.bubble-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.bubble-chart {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+}
+
+.bubble-chart h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.bubbles {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.bubble:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.bubble.author {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+}
+
+.bubble.review {
+    background: linear-gradient(45deg, #f093fb, #f5576c);
+}
+
+.bubble.research {
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+}
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 200px;
+    text-align: center;
+}
+
+.tooltip.show {
+    opacity: 1;
+}
+
+/* Bibliography Section */
+.bibliography {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.bib-section {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.bib-section h3 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.bib-item {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.bib-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.bib-item .title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.bib-item .author {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.bib-item .year {
+    color: #999;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.bib-item .source {
+    color: #667eea;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+/* Footer */
+footer {
+    background: #333;
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+}
+
+footer p {
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .project-info, 
+    .bubble-container, 
+    .bibliography {
+        grid-template-columns: 1fr;
+    }
+
+    .game-blocks {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 300px;
+    }
+
+    .block {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .section {
+        padding: 40px 0;
+    }
+
+    .section h2 {
+        font-size: 2rem;
+    }
+
+    .bubble-chart {
+        height: 300px;
+    }
+
+    .bubble {
+        font-size: 0.7rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .game-blocks {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 250px;
+    }
+
+    .block {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .info-card {
+        padding: 20px;
+    }
+
+    .bib-item {
+        padding: 15px;
+    }
+
+    .section {
+        padding: 30px 0;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Selection styles */
+::selection {
+    background: #667eea;
+    color: white;
+}
+
+::-moz-selection {
+    background: #667eea;
+    color: white;
+}
