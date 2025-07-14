@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block'hood UML Class Diagram (D3.js Canvas)</title>
+  <style>
+    body {
+      background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    h2 {
+      text-align: center;
+      margin: 1.5em 0 0.5em 0;
+      color: #1e3c72;
+      font-size: 2em;
+    }
+    #uml-canvas {
+      width: 100vw;
+      height: 1200px;
+      display: block;
+      margin: 0 auto 2em auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 32px #0001;
+    }
+    .uml-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: #1e3c72;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 1em;
+      box-shadow: 0 2px 12px #0003;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h2>Block'hood UML Class Diagram</h2>
+  <svg id="uml-canvas"></svg>
+  <div class="uml-tooltip" id="uml-tooltip"></div>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // --- UML Data (from Mermaid) ---
+    const umlClasses = [
+      {
+        name: 'GameEngine',
+        attributes: ['-timeStep: float', '-resourceManager: ResourceManager', '-decaySystem: DecaySystem', '-balanceCalculator: BalanceCalculator'],
+        methods: ['+update()', '+calculateResourceFlow()', '+checkEcologicalBalance()', '+processDecay()'],
+      },
+      {
+        name: 'Player',
+        attributes: ['-inventory: List<Block>', '-selectedBlock: Block', '-score: int'],
+        methods: ['+placeBlock(position: Vector3, blockType: BlockType)', '+removeBlock(position: Vector3)', '+selectBlock(blockType: BlockType)', '+getAvailableBlocks(): List<Block>'],
+      },
+      {
+        name: 'Neighborhood',
+        attributes: ['-blocks: Map<Vector3, Block>', '-inhabitants: List<Inhabitant>', '-ecosystem: Ecosystem', '-size: Vector3'],
+        methods: ['+addBlock(block: Block, position: Vector3)', '+removeBlock(position: Vector3)', '+getBlock(position: Vector3): Block', '+calculateTotalResources(): ResourceBundle', '+attractInhabitants()'],
+      },
+      {
+        name: 'Block',
+        stereotype: 'abstract',
+        attributes: ['-position: Vector3', '-health: float', '-inputs: List<ResourceRequirement>', '-outputs: List<ResourceProduction>', '-decayRate: float', '-isActive: boolean'],
+        methods: ['+update()', '+consume(resources: ResourceBundle): boolean', '+produce(): ResourceBundle', '+decay()', '+repair()', '+checkRequirements(): boolean'],
+      },
+      {
+        name: 'ResidentialBlock',
+        attributes: ['-capacity: int', '-comfortLevel: float', '-inhabitants: List<Human>'],
+        methods: ['+attractResidents()', '+calculateHappiness(): float', '+evictResidents()'],
+      },
+      {
+        name: 'CommercialBlock',
+        attributes: ['-businessType: BusinessType', '-customerCapacity: int', '-employeeCount: int'],
+        methods: ['+generateRevenue(): int', '+provideServices()', '+createJobs()'],
+      },
+      {
+        name: 'IndustrialBlock',
+        attributes: ['-productionRate: float', '-pollutionOutput: float', '-efficiency: float'],
+        methods: ['+manufacture()', '+processRawMaterials()', '+generatePollution()'],
+      },
+      {
+        name: 'InfrastructureBlock',
+        attributes: ['-serviceRadius: float', '-maintenanceCost: float', '-connectivity: int'],
+        methods: ['+provideService()', '+maintainNetwork()', '+connect(other: InfrastructureBlock)'],
+      },
+      {
+        name: 'EnergyBlock',
+        attributes: ['-energyType: EnergyType', '-outputCapacity: float', '-efficiency: float'],
+        methods: ['+generateEnergy(): float', '+maintainGrid()'],
+      },
+      {
+        name: 'FoodBlock',
+        attributes: ['-cropType: CropType', '-yield: float', '-seasonality: Season'],
+        methods: ['+growCrops()', '+harvest(): float', '+processFood()'],
+      },
+      {
+        name: 'WaterBlock',
+        attributes: ['-waterQuality: float', '-flowRate: float', '-purificationLevel: float'],
+        methods: ['+purifyWater()', '+distributeWater()', '+collectWater()'],
+      },
+      {
+        name: 'WasteBlock',
+        attributes: ['-processingCapacity: float', '-recyclingRate: float', '-wasteType: WasteType'],
+        methods: ['+processWaste()', '+recycleResources(): ResourceBundle', '+dispose()'],
+      }
+    ];
+
+    // --- Relationships (from Mermaid, simplified for D3) ---
+    const umlLinks = [
+      { source: 'GameEngine', target: 'ResourceManager', type: 'aggregation' },
+      { source: 'GameEngine', target: 'DecaySystem', type: 'aggregation' },
+      { source: 'GameEngine', target: 'BalanceCalculator', type: 'aggregation' },
+      { source: 'Player', target: 'Block', type: 'association' },
+      { source: 'Neighborhood', target: 'Block', type: 'aggregation' },
+      { source: 'Neighborhood', target: 'Ecosystem', type: 'aggregation' },
+      { source: 'Neighborhood', target: 'Inhabitant', type: 'aggregation' },
+      { source: 'Neighborhood', target: 'Vector3', type: 'association' },
+      { source: 'Block', target: 'ResourceRequirement', type: 'aggregation' },
+      { source: 'Block', target: 'ResourceProduction', type: 'aggregation' },
+      { source: 'Block', target: 'ResourceBundle', type: 'association' },
+      { source: 'Block', target: 'ResidentialBlock', type: 'inheritance' },
+      { source: 'Block', target: 'CommercialBlock', type: 'inheritance' },
+      { source: 'Block', target: 'IndustrialBlock', type: 'inheritance' },
+      { source: 'Block', target: 'InfrastructureBlock', type: 'inheritance' },
+      { source: 'Block', target: 'EnergyBlock', type: 'inheritance' },
+      { source: 'Block', target: 'FoodBlock', type: 'inheritance' },
+      { source: 'Block', target: 'WaterBlock', type: 'inheritance' },
+      { source: 'Block', target: 'WasteBlock', type: 'inheritance' },
+      { source: 'ResidentialBlock', target: 'Human', type: 'aggregation' },
+      { source: 'CommercialBlock', target: 'BusinessType', type: 'association' },
+      { source: 'IndustrialBlock', target: 'WasteBlock', type: 'association' },
+      { source: 'InfrastructureBlock', target: 'InfrastructureBlock', type: 'association' },
+      { source: 'EnergyBlock', target: 'EnergyType', type: 'association' },
+      { source: 'FoodBlock', target: 'CropType', type: 'association' },
+      { source: 'FoodBlock', target: 'Season', type: 'association' },
+      { source: 'WaterBlock', target: 'WasteBlock', type: 'association' },
+      { source: 'WasteBlock', target: 'WasteType', type: 'association' },
+    ];
+
+    // --- D3.js Force-Directed UML Canvas ---
+    const width = window.innerWidth, height = 1200;
+    const svg = d3.select('#uml-canvas')
+      .attr('width', width)
+      .attr('height', height);
+
+    // Tooltip
+    const tooltip = d3.select('#uml-tooltip');
+
+    // Build nodes from classes and unique types
+    let nodeMap = {};
+    umlClasses.forEach(cls => { nodeMap[cls.name] = { ...cls, type: 'class' }; });
+    umlLinks.forEach(link => {
+      if (!nodeMap[link.target]) nodeMap[link.target] = { name: link.target, type: 'type' };
+    });
+    const nodes = Object.values(nodeMap);
+    const links = umlLinks.map(l => ({ ...l, source: l.source, target: l.target }));
+
+    // D3 force simulation
+    const simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id(d => d.name).distance(210).strength(0.8))
+      .force('charge', d3.forceManyBody().strength(-1200))
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .force('collide', d3.forceCollide(120));
+
+    // Draw links
+    const link = svg.append('g')
+      .attr('stroke', '#aaa')
+      .attr('stroke-width', 2)
+      .selectAll('line')
+      .data(links)
+      .enter().append('line')
+      .attr('marker-end', d => {
+        if (d.type === 'inheritance') return 'url(#triangle)';
+        if (d.type === 'aggregation') return 'url(#diamond)';
+        if (d.type === 'association') return 'url(#arrow)';
+        return '';
+      });
+
+    // Define markers
+    svg.append('defs').selectAll('marker')
+      .data([
+        { id: 'triangle', color: '#1e3c72', refX: 29, path: 'M 0 0 L 20 10 L 0 20 z' },
+        { id: 'diamond', color: '#4CAF50', refX: 29, path: 'M 0 10 L 10 0 L 20 10 L 10 20 z' },
+        { id: 'arrow', color: '#2196F3', refX: 29, path: 'M 0 0 L 20 10 L 0 20 L 6 10 z' },
+      ])
+      .enter().append('marker')
+      .attr('id', d => d.id)
+      .attr('viewBox', '0 0 30 20')
+      .attr('refX', d => d.refX)
+      .attr('refY', 10)
+      .attr('markerWidth', 16)
+      .attr('markerHeight', 16)
+      .attr('orient', 'auto')
+      .append('path')
+      .attr('d', d => d.path)
+      .attr('fill', d => d.color);
+
+    // Draw nodes (class rectangles)
+    const node = svg.selectAll('.uml-class')
+      .data(nodes)
+      .enter().append('g')
+      .attr('class', d => d.type === 'class' ? 'uml-class' : 'uml-type')
+      .call(d3.drag()
+        .on('start', dragstarted)
+        .on('drag', dragged)
+        .on('end', dragended));
+
+    // Rectangle for class
+    node.filter(d => d.type === 'class')
+      .append('rect')
+      .attr('width', 260)
+      .attr('height', d => 60 + (d.attributes?.length || 0) * 22 + (d.methods?.length || 0) * 22)
+      .attr('rx', 16)
+      .attr('fill', '#f7fafc')
+      .attr('stroke', '#1e3c72')
+      .attr('stroke-width', 3)
+      .on('mousemove', (event, d) => showTooltip(event, d))
+      .on('mouseleave', hideTooltip);
+
+    // Rectangle for type
+    node.filter(d => d.type === 'type')
+      .append('rect')
+      .attr('width', 150)
+      .attr('height', 38)
+      .attr('rx', 12)
+      .attr('fill', '#e3f2fd')
+      .attr('stroke', '#2196F3')
+      .attr('stroke-width', 2);
+
+    // Class name
+    node.append('text')
+      .attr('x', d => d.type === 'class' ? 130 : 75)
+      .attr('y', 30)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', d => d.type === 'class' ? '1.3em' : '1em')
+      .attr('font-weight', d => d.stereotype === 'abstract' ? 'bold' : 'normal')
+      .attr('fill', d => d.type === 'class' ? '#1e3c72' : '#2196F3')
+      .text(d => d.name + (d.stereotype === 'abstract' ? ' (abstract)' : ''));
+
+    // Attributes and methods
+    node.filter(d => d.type === 'class').each(function(d) {
+      d3.select(this).selectAll('.attribute')
+        .data(d.attributes || [])
+        .enter().append('text')
+        .attr('class', 'attribute')
+        .attr('x', 16)
+        .attr('y', (attr, i) => 50 + i * 22)
+        .attr('font-size', '1em')
+        .attr('fill', '#444')
+        .text(attr => attr);
+      d3.select(this).selectAll('.method')
+        .data(d.methods || [])
+        .enter().append('text')
+        .attr('class', 'method')
+        .attr('x', 16)
+        .attr('y', (meth, i) => 50 + (d.attributes?.length || 0) * 22 + i * 22)
+        .attr('font-size', '1em')
+        .attr('fill', '#388e3c')
+        .text(meth => meth);
+    });
+
+    simulation.on('tick', () => {
+      link
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+      node
+        .attr('transform', d => `translate(${d.x - (d.type === 'class' ? 130 : 75)},${d.y - 30})`);
+    });
+
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+    function showTooltip(event, d) {
+      tooltip.style('opacity', 1)
+        .html(`<strong>${d.name}</strong><br>${d.attributes ? d.attributes.join('<br>') : ''}${d.methods ? '<br><em>' + d.methods.join('<br>') + '</em>' : ''}`)
+        .style('left', (event.pageX + 24) + 'px')
+        .style('top', (event.pageY - 18) + 'px');
+    }
+    function hideTooltip() {
+      tooltip.style('opacity', 0);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+classDiagram
+    class GameEngine {
+        -timeStep: float
+        -resourceManager: ResourceManager
+        -decaySystem: DecaySystem
+        -balanceCalculator: BalanceCalculator
+        +update()
+        +calculateResourceFlow()
+        +checkEcologicalBalance()
+        +processDecay()
+    }
+    
+    class Player {
+        -inventory: List~Block~
+        -selectedBlock: Block
+        -score: int
+        +placeBlock(position: Vector3, blockType: BlockType)
+        +removeBlock(position: Vector3)
+        +selectBlock(blockType: BlockType)
+        +getAvailableBlocks(): List~Block~
+    }
+    
+    class Neighborhood {
+        -blocks: Map~Vector3, Block~
+        -inhabitants: List~Inhabitant~
+        -ecosystem: Ecosystem
+        -size: Vector3
+        +addBlock(block: Block, position: Vector3)
+        +removeBlock(position: Vector3)
+        +getBlock(position: Vector3): Block
+        +calculateTotalResources(): ResourceBundle
+        +attractInhabitants()
+    }
+    
+    class Block {
+        <<abstract>>
+        -position: Vector3
+        -health: float
+        -inputs: List~ResourceRequirement~
+        -outputs: List~ResourceProduction~
+        -decayRate: float
+        -isActive: boolean
+        +update()
+        +consume(resources: ResourceBundle): boolean
+        +produce(): ResourceBundle
+        +decay()
+        +repair()
+        +checkRequirements(): boolean
+    }
+    
+    class ResidentialBlock {
+        -capacity: int
+        -comfortLevel: float
+        -inhabitants: List~Human~
+        +attractResidents()
+        +calculateHappiness(): float
+        +evictResidents()
+    }
+    
+    class CommercialBlock {
+        -businessType: BusinessType
+        -customerCapacity: int
+        -employeeCount: int
+        +generateRevenue(): int
+        +provideServices()
+        +createJobs()
+    }
+    
+    class IndustrialBlock {
+        -productionRate: float
+        -pollutionOutput: float
+        -efficiency: float
+        +manufacture()
+        +processRawMaterials()
+        +generatePollution()
+    }
+    
+    class InfrastructureBlock {
+        -serviceRadius: float
+        -maintenanceCost: float
+        -connectivity: int
+        +provideService()
+        +maintainNetwork()
+        +connect(other: InfrastructureBlock)
+    }
+    
+    class EnergyBlock {
+        -energyType: EnergyType
+        -outputCapacity: float
+        -efficiency: float
+        +generateEnergy(): float
+        +maintainGrid()
+    }
+    
+    class FoodBlock {
+        -cropType: CropType
+        -yield: float
+        -seasonality: Season
+        +growCrops()
+        +harvest(): float
+        +processFood()
+    }
+    
+    class WaterBlock {
+        -waterQuality: float
+        -flowRate: float
+        -purificationLevel: float
+        +purifyWater()
+        +distributeWater()
+        +collectWater()
+    }
+    
+    class WasteBlock {
+        -processingCapacity: float
+        -recyclingRate: float
+        -wasteType: WasteType
+        +processWaste()
+        +recycleResources(): ResourceBundle
+        +dispose()
+    }
+    
+    class ResourceManager {
+        -availableResources: Map~ResourceType, float~
+        -consumptionRate: Map~ResourceType, float~
+        -productionRate: Map~ResourceType, float~
+        +trackResource(type: ResourceType, amount: float)
+        +consumeResource(type: ResourceType, amount: float): boolean
+        +produceResource(type: ResourceType, amount: float)
+        +getResourceBalance(type: ResourceType): float
+        +calculateNetFlow(): ResourceBundle
+    }
+    
+    class Resource {
+        <<enumeration>>
+        ENERGY
+        FOOD
+        WATER
+        WASTE
+        POPULATION
+        MATERIALS
+        POLLUTION
+        KNOWLEDGE
+        HAPPINESS
+        BIODIVERSITY
+    }
+    
+    class ResourceBundle {
+        -resources: Map~Resource, float~
+        +add(resource: Resource, amount: float)
+        +consume(resource: Resource, amount: float): boolean
+        +getAmount(resource: Resource): float
+        +isEmpty(): boolean
+        +merge(other: ResourceBundle)
+    }
+    
+    class Inhabitant {
+        <<abstract>>
+        -position: Vector3
+        -needs: List~Resource~
+        -happiness: float
+        -lifespan: float
+        +move()
+        +consumeResources()
+        +reproduce()
+        +die()
+    }
+    
+    class Human {
+        -job: JobType
+        -family: List~Human~
+        -skills: List~Skill~
+        +work()
+        +socialize()
+        +educate()
+        +createFamily()
+    }
+    
+    class Animal {
+        -species: SpeciesType
+        -habitat: HabitatType
+        -populationSize: int
+        +migrate()
+        +adapt()
+        +pollinate()
+        +maintainEcosystem()
+    }
+    
+    class Ecosystem {
+        -biodiversity: float
+        -health: float
+        -pollutionLevel: float
+        -animalPopulations: Map~SpeciesType, int~
+        +calculateBiodiversity(): float
+        +processEnvironmentalImpact()
+        +supportSpecies()
+        +regenerate()
+    }
+    
+    class DecaySystem {
+        -decayRate: float
+        -threshold: float
+        +processDecay(block: Block)
+        +calculateDecayRate(block: Block): float
+        +checkThreshold(block: Block): boolean
+        +triggerCollapse(block: Block)
+    }
+    
+    class BalanceCalculator {
+        -optimalRatios: Map~Resource, float~
+        -toleranceLevels: Map~Resource, float~
+        +calculateBalance(): float
+        +checkSustainability(): boolean
+        +identifyImbalances(): List~Resource~
+        +suggestCorrections(): List~Action~
+    }
+    
+    %% Relationships
+    GameEngine --> ResourceManager : manages
+    GameEngine --> DecaySystem : uses
+    GameEngine --> BalanceCalculator : uses
+    GameEngine --> Neighborhood : updates
+    
+    Player --> Neighborhood : builds
+    Player --> Block : places/removes
+    
+    Neighborhood --> Block : contains
+    Neighborhood --> Inhabitant : houses
+    Neighborhood --> Ecosystem : maintains
+    
+    Block <|-- ResidentialBlock
+    Block <|-- CommercialBlock
+    Block <|-- IndustrialBlock
+    Block <|-- InfrastructureBlock
+    Block <|-- EnergyBlock
+    Block <|-- FoodBlock
+    Block <|-- WaterBlock
+    Block <|-- WasteBlock
+    
+    Block --> ResourceBundle : consumes/produces
+    ResourceBundle --> Resource : contains
+    
+    Inhabitant <|-- Human
+    Inhabitant <|-- Animal
+    
+    ResidentialBlock --> Human : houses
+    Ecosystem --> Animal : supports
+    
+    ResourceManager --> ResourceBundle : manages
+    DecaySystem --> Block : affects
+    BalanceCalculator --> ResourceBundle : analyzes
+    
+    Human --> ResourceBundle : consumes
+    Animal --> Ecosystem : depends on
+    
+    %% Aggregation relationships
+    Neighborhood o-- Block
+    Neighborhood o-- Inhabitant
+    Block o-- ResourceBundle
+    Human o-- ResourceBundle

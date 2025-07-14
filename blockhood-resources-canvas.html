@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temporal Structure of Resources in Block'hood</title>
+  <style>
+    body {
+      background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      color: #1e3c72;
+    }
+    h2 {
+      text-align: center;
+      margin: 2em 0 1em 0;
+      color: #1e3c72;
+      font-size: 2em;
+    }
+    #resource-canvas {
+      display: block;
+      margin: 0 auto 2em auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 32px #0001;
+      width: 98vw;
+      max-width: 1100px;
+      height: 480px;
+    }
+    .resource-legend {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2em;
+      margin: 0.5em auto 2em auto;
+      font-size: 1.1em;
+      flex-wrap: wrap;
+    }
+    .legend-flip {
+      background: transparent;
+      perspective: 600px;
+      width: 82px;
+      height: 52px;
+      margin: 0.5em 0.3em;
+      display: inline-block;
+    }
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s cubic-bezier(.4,2,.6,1);
+      transform-style: preserve-3d;
+    }
+    .legend-flip:hover .flip-inner, .legend-flip:focus .flip-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-front, .flip-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px #0001;
+    }
+    .flip-front { font-size: 2em; }
+    .legend-basic .flip-front, .legend-basic .flip-back { background: #b3e5fc; color: #1976d2; }
+    .legend-basicnatural .flip-front, .legend-basicnatural .flip-back { background: #c8e6c9; color: #388e3c; }
+    .legend-intermediate .flip-front, .legend-intermediate .flip-back { background: #fff9c4; color: #bfa700; }
+    .legend-advanced .flip-front, .legend-advanced .flip-back { background: #e1bee7; color: #6a1b9a; }
+    .legend-negative .flip-front, .legend-negative .flip-back { background: #ffcdd2; color: #c62828; }
+    .legend-systemic .flip-front, .legend-systemic .flip-back { background: #cfd8dc; color: #455a64; }
+    .flip-back {
+      transform: rotateY(180deg);
+      font-size: 1em;
+      padding: 0 0.4em;
+    }
+    @media (max-width: 700px) {
+      #resource-canvas { height: 700px; }
+      h2 { font-size: 1.2em; }
+      .legend-flip { width: 64px; height: 40px; }
+      .flip-front, .flip-back { font-size: 1.1em; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Temporal Structure of Resources in Block'hood</h2>
+  <div class="resource-legend">
+    <div class="legend-flip legend-basic"><div class="flip-inner"><div class="flip-front">🌱</div><div class="flip-back">Basic</div></div></div>
+    <div class="legend-flip legend-basicnatural"><div class="flip-inner"><div class="flip-front">🌿</div><div class="flip-back">Basic/Natural</div></div></div>
+    <div class="legend-flip legend-intermediate"><div class="flip-inner"><div class="flip-front">🔷</div><div class="flip-back">Intermediate</div></div></div>
+    <div class="legend-flip legend-advanced"><div class="flip-inner"><div class="flip-front">✨</div><div class="flip-back">Advanced</div></div></div>
+    <div class="legend-flip legend-negative"><div class="flip-inner"><div class="flip-front">⚠️</div><div class="flip-back">Negative</div></div></div>
+    <div class="legend-flip legend-systemic"><div class="flip-inner"><div class="flip-front">♻️</div><div class="flip-back">Systemic/Decay</div></div></div>
+  </div>
+  <svg id="resource-canvas"></svg>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // Resource data in the order of the image
+    const phases = ["Early", "Mid", "Late"];
+    const resources = [
+      { name: "Water", phase: "Early", category: "Basic" },
+      { name: "Electricity", phase: "Early", category: "Basic" },
+      { name: "Oxygen", phase: "Early", category: "Basic/Natural" },
+      { name: "Food", phase: "Early", category: "Basic/Natural" },
+      { name: "Organic Waste", phase: "Early", category: "Negative" },
+      { name: "Money", phase: "Early", category: "Basic" },
+      { name: "Education", phase: "Mid", category: "Intermediate" },
+      { name: "Leisure", phase: "Mid", category: "Intermediate" },
+      { name: "Labor", phase: "Mid", category: "Intermediate" },
+      { name: "Goods", phase: "Mid", category: "Intermediate" },
+      { name: "Waste", phase: "Mid", category: "Negative" },
+      { name: "Noise", phase: "Mid", category: "Negative" },
+      { name: "Research", phase: "Late", category: "Advanced" },
+      { name: "Data", phase: "Late", category: "Advanced" },
+      { name: "Culture", phase: "Late", category: "Advanced" },
+      { name: "Entropy", phase: "Late", category: "Systemic/Decay" },
+    ];
+    const categoryColors = {
+      "Basic": "#b3e5fc",
+      "Basic/Natural": "#c8e6c9",
+      "Intermediate": "#fff9c4",
+      "Advanced": "#e1bee7",
+      "Negative": "#ffcdd2",
+      "Systemic/Decay": "#cfd8dc"
+    };
+    const categoryText = {
+      "Basic": "#1976d2",
+      "Basic/Natural": "#388e3c",
+      "Intermediate": "#bfa700",
+      "Advanced": "#6a1b9a",
+      "Negative": "#c62828",
+      "Systemic/Decay": "#455a64"
+    };
+    // SVG setup
+    const svg = d3.select('#resource-canvas');
+    const width = parseInt(svg.style('width')) || 1100;
+    const height = parseInt(svg.style('height')) || 480;
+    const boxW = 120, boxH = 60, boxGap = 12;
+    const yMap = { Early: 70, Mid: 180, Late: 290 };
+    // Group by phase for horizontal arrangement
+    const phaseGroups = { Early: [], Mid: [], Late: [] };
+    resources.forEach(r => phaseGroups[r.phase].push(r));
+    // Draw phase labels
+    svg.selectAll('.phase-label')
+      .data(phases)
+      .enter().append('text')
+      .attr('class', 'phase-label')
+      .attr('x', 10)
+      .attr('y', d => yMap[d] + boxH/2)
+      .attr('font-size', '1.3em')
+      .attr('fill', '#222')
+      .attr('font-weight', 'bold')
+      .attr('alignment-baseline', 'middle')
+      .text(d => d);
+    // Draw resource boxes
+    let xStart = 80;
+    phases.forEach(phase => {
+      let x = xStart;
+      phaseGroups[phase].forEach((r, i) => {
+        svg.append('rect')
+          .attr('x', x)
+          .attr('y', yMap[phase])
+          .attr('width', boxW)
+          .attr('height', boxH)
+          .attr('rx', 16)
+          .attr('fill', categoryColors[r.category])
+          .attr('stroke', '#888')
+          .attr('stroke-width', 1.5);
+        svg.append('text')
+          .attr('x', x + boxW/2)
+          .attr('y', yMap[phase] + boxH/2)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '1em')
+          .attr('fill', categoryText[r.category])
+          .attr('alignment-baseline', 'middle')
+          .text(r.name);
+        x += boxW + boxGap;
+      });
+    });
+    // Legend is handled in HTML below SVG
+  </script>
+</body>
+</html>

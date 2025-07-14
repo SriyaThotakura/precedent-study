@@ -176,24 +176,21 @@ nav a:hover {
     padding: 60px 0;
 }
 
-.section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    text-align: center;
-    color: #333;
-    position: relative;
+.section#overview {
+    background: linear-gradient(135deg, #181d31 0%, #232946 100%);
+    border-radius: 18px;
+    box-shadow: 0 6px 36px #0008;
+    padding: 64px 0 48px 0;
+    margin-bottom: 2em;
 }
 
-.section h2::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    border-radius: 2px;
+.section#overview h2 {
+    color: #f2f2f2;
+    text-shadow: 0 2px 16px #23294699;
+}
+
+.section#overview h2::after {
+    background: linear-gradient(90deg, #00ff88 0%, #667eea 100%);
 }
 
 .project-info {
@@ -201,6 +198,56 @@ nav a:hover {
     grid-template-columns: 1fr 1fr;
     gap: 40px;
     margin-bottom: 60px;
+    background: transparent;
+}
+
+.section#overview .project-info {
+    background: none;
+}
+
+.section#overview .info-card {
+    background: linear-gradient(135deg, #232946 80%, #181d31 100%);
+    color: #f2f2f2;
+    border-radius: 16px;
+    box-shadow: 0 6px 36px #0005;
+    border: 1.5px solid #00ff8890;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.section#overview .info-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 16px 48px #00ff8855;
+    border-color: #00ffcc;
+}
+
+.section#overview .info-card h3 {
+    color: #00ffcc;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 8px #00ff8840;
+}
+
+.section#overview .info-card p {
+    color: #e0e0e0;
+}
+
+.section#overview .info-card .tag {
+    background: linear-gradient(90deg, #00ff88 0%, #667eea 100%);
+    color: #181d31;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    margin-right: 10px;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 12px #00ff8830;
+    font-weight: 600;
+    display: inline-block;
+    transition: background 0.3s, color 0.3s;
+}
+
+.section#overview .info-card .tag:hover {
+    background: linear-gradient(90deg, #667eea 0%, #00ff88 100%);
+    color: #fff;
 }
 
 .info-card {
@@ -401,6 +448,24 @@ footer {
     padding: 40px 0;
     text-align: center;
 }
+
+/* Floating Block'hood Widget Styles */
+.floating-block-widget {
+    position: fixed;
+    z-index: 30;
+    pointer-events: none;
+    filter: drop-shadow(0 6px 16px #00ff8866) drop-shadow(0 0 6px #fff3);
+    border-radius: 10px;
+    transition: transform 0.7s cubic-bezier(.4,2,.6,1), opacity 0.7s;
+    will-change: transform, left, top;
+    opacity: 0.85;
+    animation: floating-block-rot 7s ease-in-out infinite alternate;
+}
+@keyframes floating-block-rot {
+    0% { transform: rotate(-6deg) scale(1.00); }
+    100% { transform: rotate(7deg) scale(1.04); }
+}
+
 
 footer p {
     margin-bottom: 10px;
