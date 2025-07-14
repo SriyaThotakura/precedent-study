@@ -5,8 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block'hood - Urban Simulation Game Research Hub</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ontologies-table.css">
 </head>
 <body>
+    <!-- Image Slider Start -->
+    <section class="image-slider-section">
+        <div class="image-slider" id="imageSlider">
+            <!-- Slides will be injected by slider.js -->
+        </div>
+        <div class="slider-nav">
+            <button class="slider-arrow left" id="sliderPrev">&#10094;</button>
+            <div class="slider-dots" id="sliderDots"></div>
+            <button class="slider-arrow right" id="sliderNext">&#10095;</button>
+        </div>
+    </section>
+    <!-- Image Slider End -->
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -75,6 +89,52 @@
                 </div>
             </div>
         </section>
+
+        <!-- Ontologies Table Start -->
+        <section class="ontologies-section">
+            <div class="container">
+                <h2>Ontologies of Block'hood</h2>
+                <table class="ontologies-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Examples / Subtypes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Structural Blocks</strong></td>
+                            <td>Apartments, cafes, wind turbines, elevators</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Resources</strong></td>
+                            <td>Electricity, water, food, waste, money</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agents</strong></td>
+                            <td>Residents, workers, visitors</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Processes</strong></td>
+                            <td>Production, decay, entropy, resource flow</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Environmental</strong></td>
+                            <td>Sunlight, air quality, terrain biome</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Player Actions</strong></td>
+                            <td>Placing, removing, connecting blocks, managing systems</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Abstract Rules</strong></td>
+                            <td>Ecological, economic, social satisfaction, sustainability</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Ontologies Table End -->
 
         <section id="research" class="bubble-section">
             <div class="container">
@@ -239,14 +299,22 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2024 Block'hood Research Hub. Educational research compilation.</p>
-            <p>Block'hood © Jose Sanchez / Plethora Project</p>
         </div>
     </footer>
 
     <!-- Tooltip for bubbles -->
     <div id="tooltip" class="tooltip"></div>
 
+    <script src="slider.js"></script>
     <script src="script.js"></script>
+<link rel="stylesheet" href="slider.css">
+
+    <!-- Block'hood Historical & Contextual Analysis Canvas -->
+    <section class="blockhood-canvas-section" style="margin-top: 3em;">
+        <div class="container">
+            <h2 style="text-align:center; color:#1e3c72; margin-bottom:1em; font-size:2em;">Block'hood Historical & Contextual Analysis</h2>
+            <iframe src="blockhood-analysis.html" style="width:100%; min-height:900px; border:none; border-radius:16px; box-shadow:0 4px 32px #0002; background:white;"></iframe>
+        </div>
+    </section>
 </body>
 </html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood Historical & Contextual Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow-x: auto;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .chart-title {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #ffffff;
+        }
+        
+        .timeline-container {
+            grid-column: 1 / -1;
+        }
+        
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .node:hover {
+            transform: scale(1.1);
+        }
+        
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+            transition: stroke-width 0.3s ease;
+        }
+        
+        .link:hover {
+            stroke-width: 3px;
+        }
+        
+        .timeline-event {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-event:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 300px;
+            pointer-events: none;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .control-button.active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .treemap-rect {
+            stroke: white;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .treemap-rect:hover {
+            stroke-width: 3;
+            filter: brightness(1.2);
+        }
+        
+        .treemap-text {
+            font-size: 12px;
+            fill: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏙️ Block'hood: Historical & Contextual Analysis</h1>
+            <p>Interactive D3.js visualization of the game's development context and influences</p>
+        </div>
+        
+        <div class="controls">
+            <button class="control-button active" onclick="showView('timeline')">📅 Timeline</button>
+            <button class="control-button" onclick="showView('network')">🌐 Network</button>
+            <button class="control-button" onclick="showView('audience')">🎯 Audience</button>
+            <button class="control-button" onclick="showView('context')">🌍 Context</button>
+        </div>
+        
+        <div class="visualization-grid">
+            <div class="chart-container timeline-container" id="timeline-view">
+                <div class="chart-title">Development Timeline & Context</div>
+                <div id="timeline-chart" style="height: 400px;"></div>
+            </div>
+            
+            <div class="chart-container" id="network-view" style="display: none;">
+                <div class="chart-title">Influence Network</div>
+                <div id="network-chart" style="height: 400px;"></div>
+            </div>
+            
+            <div class="chart-container" id="audience-view" style="display: none;">
+                <div class="chart-title">Target Audience Analysis</div>
+                <div id="audience-chart" style="height: 400px;"></div>
+            </div>
+            
+            <div class="chart-container" id="context-view" style="display: none;">
+                <div class="chart-title">Cultural Context Mapping</div>
+                <div id="context-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+        
+        <div class="legend" id="legend"></div>
+    </div>
+    
+    <div class="tooltip" id="tooltip" style="display: none;"></div>
+
+    <script>
+        // Data structure for Block'hood analysis
+        const data = {
+            timeline: [
+                { year: 2015, event: "Development Begins", category: "development", description: "Jose Sanchez starts developing Block'hood as design research tool", color: "#FF6B6B" },
+                { year: 2016, event: "Early Access Release", category: "development", description: "Game released in early access on Steam", color: "#FF6B6B" },
+                { year: 2017, event: "Full Launch", category: "development", description: "Complete version released with all features", color: "#FF6B6B" },
+                { year: 2015, event: "Paris Climate Agreement", category: "context", description: "Global climate awareness peaks", color: "#4ECDC4" },
+                { year: 2016, event: "Urban Population > 50%", category: "context", description: "More than half of world population lives in cities", color: "#4ECDC4" },
+                { year: 2017, event: "Serious Games Rise", category: "context", description: "Educational gaming becomes mainstream", color: "#4ECDC4" }
+            ],
+            
+            network: {
+                nodes: [
+                    { id: "blockhood", name: "Block'hood", type: "game", size: 30, color: "#FF6B6B" },
+                    { id: "sanchez", name: "Jose Sanchez", type: "author", size: 25, color: "#FFD93D" },
+                    { id: "cybernetics", name: "Cybernetics", type: "theory", size: 15, color: "#6BCF7F" },
+                    { id: "ecological", name: "Ecological Urbanism", type: "theory", size: 20, color: "#6BCF7F" },
+                    { id: "systems", name: "Systems Thinking", type: "theory", size: 18, color: "#6BCF7F" },
+                    { id: "climate", name: "Climate Crisis", type: "context", size: 22, color: "#4ECDC4" },
+                    { id: "urbanization", name: "Urbanization", type: "context", size: 20, color: "#4ECDC4" },
+                    { id: "simcity", name: "SimCity", type: "game", size: 16, color: "#FF6B6B" },
+                    { id: "minecraft", name: "Minecraft", type: "game", size: 18, color: "#FF6B6B" },
+                    { id: "cities", name: "Cities: Skylines", type: "game", size: 16, color: "#FF6B6B" }
+                ],
+                links: [
+                    { source: "sanchez", target: "blockhood", strength: 10 },
+                    { source: "sanchez", target: "cybernetics", strength: 8 },
+                    { source: "sanchez", target: "ecological", strength: 9 },
+                    { source: "sanchez", target: "systems", strength: 8 },
+                    { source: "blockhood", target: "climate", strength: 7 },
+                    { source: "blockhood", target: "urbanization", strength: 6 },
+                    { source: "blockhood", target: "simcity", strength: 4 },
+                    { source: "blockhood", target: "minecraft", strength: 5 },
+                    { source: "blockhood", target: "cities", strength: 4 },
+                    { source: "ecological", target: "climate", strength: 6 },
+                    { source: "systems", target: "urbanization", strength: 5 }
+                ]
+            },
+            
+            audience: [
+                { name: "Designers & Urban Planners", value: 35, color: "#FF6B6B", description: "Primary audience for experimentation" },
+                { name: "Educators & Students", value: 30, color: "#FFD93D", description: "Systems thinking advocates" },
+                { name: "Indie Game Players", value: 25, color: "#6BCF7F", description: "City-building enthusiasts" },
+                { name: "Researchers", value: 10, color: "#4ECDC4", description: "Academic and design tool users" }
+            ],
+            
+            context: [
+                { name: "Sustainability", value: 25, color: "#4ECDC4", children: [
+                    { name: "Climate Crisis", value: 15, color: "#4ECDC4" },
+                    { name: "Resource Scarcity", value: 10, color: "#4ECDC4" }
+                ]},
+                { name: "Urbanism", value: 30, color: "#6BCF7F", children: [
+                    { name: "Smart Cities", value: 15, color: "#6BCF7F" },
+                    { name: "Green Design", value: 15, color: "#6BCF7F" }
+                ]},
+                { name: "Gaming", value: 25, color: "#FFD93D", children: [
+                    { name: "Serious Games", value: 15, color: "#FFD93D" },
+                    { name: "Simulation Games", value: 10, color: "#FFD93D" }
+                ]},
+                { name: "Education", value: 20, color: "#FF6B6B", children: [
+                    { name: "Project-Based Learning", value: 10, color: "#FF6B6B" },
+                    { name: "Design Thinking", value: 10, color: "#FF6B6B" }
+                ]}
+            ]
+        };
+        
+        // Tooltip
+        const tooltip = d3.select("#tooltip");
+        
+        // Current view
+        let currentView = 'timeline';
+        
+        function showTooltip(event, text) {
+            tooltip.style("display", "block")
+                   .html(text)
+                   .style("left", (event.pageX + 10) + "px")
+                   .style("top", (event.pageY - 10) + "px");
+        }
+        
+        function hideTooltip() {
+            tooltip.style("display", "none");
+        }
+        
+        // Timeline Visualization
+        function createTimeline() {
+            const container = d3.select("#timeline-chart");
+            container.selectAll("*").remove();
+            
+            const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+            const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            
+            const svg = container.append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+            
+            const g = svg.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            const xScale = d3.scaleLinear()
+                .domain([2014, 2018])
+                .range([0, width]);
+            
+            const yScale = d3.scalePoint()
+                .domain(["development", "context"])
+                .range([height/4, 3*height/4]);
+            
+            // Timeline line
+            g.append("line")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("y1", height/2)
+                .attr("y2", height/2)
+                .attr("stroke", "white")
+                .attr("stroke-width", 2);
+            
+            // Events
+            data.timeline.forEach(event => {
+                const x = xScale(event.year);
+                const y = yScale(event.category);
+                
+                g.append("circle")
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 8)
+                    .attr("fill", event.color)
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 2)
+                    .attr("class", "timeline-event")
+                    .on("mouseover", (e) => showTooltip(e, `<strong>${event.event}</strong><br>${event.description}`))
+                    .on("mouseout", hideTooltip);
+                
+                g.append("text")
+                    .attr("x", x)
+                    .attr("y", y - 20)
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "white")
+                    .attr("font-size", "12px")
+                    .text(event.event);
+            });
+            
+            // Axes
+            g.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
+            
+            g.append("g")
+                .call(d3.axisLeft(yScale));
+        }
+        
+        // Network Visualization
+        function createNetwork() {
+            const container = d3.select("#network-chart");
+            container.selectAll("*").remove();
+            
+            const width = container.node().getBoundingClientRect().width;
+            const height = 400;
+            
+            const svg = container.append("svg")
+                .attr("width", width)
+                .attr("height", height);
+            
+            const simulation = d3.forceSimulation(data.network.nodes)
+                .force("link", d3.forceLink(data.network.links).id(d => d.id).strength(d => d.strength * 0.1))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2));
+            
+            const link = svg.append("g")
+                .selectAll("line")
+                .data(data.network.links)
+                .enter().append("line")
+                .attr("class", "link")
+                .attr("stroke-width", d => d.strength);
+            
+            const node = svg.append("g")
+                .selectAll("circle")
+                .data(data.network.nodes)
+                .enter().append("circle")
+                .attr("class", "node")
+                .attr("r", d => d.size)
+                .attr("fill", d => d.color)
+                .attr("stroke", "white")
+                .attr("stroke-width", 2)
+                .on("mouseover", (e, d) => showTooltip(e, `<strong>${d.name}</strong><br>Type: ${d.type}`))
+                .on("mouseout", hideTooltip)
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended));
+            
+            const labels = svg.append("g")
+                .selectAll("text")
+                .data(data.network.nodes)
+                .enter().append("text")
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .attr("font-size", "10px")
+                .attr("font-weight", "bold")
+                .text(d => d.name)
+                .style("pointer-events", "none");
+            
+            simulation.on("tick", () => {
+                link.attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+                
+                node.attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+                
+                labels.attr("x", d => d.x)
+                      .attr("y", d => d.y + 4);
+            });
+            
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+            
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+        
+        // Audience Pie Chart
+        function createAudienceChart() {
+            const container = d3.select("#audience-chart");
+            container.selectAll("*").remove();
+            
+            const width = container.node().getBoundingClientRect().width;
+            const height = 400;
+            const radius = Math.min(width, height) / 2 - 20;
+            
+            const svg = container.append("svg")
+                .attr("width", width)
+                .attr("height", height);
+            
+            const g = svg.append("g")
+                .attr("transform", `translate(${width/2},${height/2})`);
+            
+            const pie = d3.pie()
+                .value(d => d.value)
+                .sort(null);
+            
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+            
+            const arcs = g.selectAll(".arc")
+                .data(pie(data.audience))
+                .enter().append("g")
+                .attr("class", "arc");
+            
+            arcs.append("path")
+                .attr("d", arc)
+                .attr("fill", d => d.data.color)
+                .attr("stroke", "white")
+                .attr("stroke-width", 2)
+                .on("mouseover", (e, d) => showTooltip(e, `<strong>${d.data.name}</strong><br>${d.data.value}%<br>${d.data.description}`))
+                .on("mouseout", hideTooltip);
+            
+            arcs.append("text")
+                .attr("transform", d => `translate(${arc.centroid(d)})`)
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .attr("font-size", "12px")
+                .attr("font-weight", "bold")
+                .text(d => `${d.data.value}%`);
+        }
+        
+        // Context Treemap
+        function createContextChart() {
+            const container = d3.select("#context-chart");
+            container.selectAll("*").remove();
+            
+            const width = container.node().getBoundingClientRect().width;
+            const height = 400;
+            
+            const svg = container.append("svg")
+                .attr("width", width)
+                .attr("height", height);
+            
+            const hierarchy = d3.hierarchy({ children: data.context })
+                .sum(d => d.value);
+            
+            const treemap = d3.treemap()
+                .size([width, height])
+                .padding(2);
+            
+            const root = treemap(hierarchy);
+            
+            const leaf = svg.selectAll("g")
+                .data(root.leaves())
+                .enter().append("g")
+                .attr("transform", d => `translate(${d.x0},${d.y0})`);
+            
+            leaf.append("rect")
+                .attr("class", "treemap-rect")
+                .attr("width", d => d.x1 - d.x0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("fill", d => d.data.color)
+                .on("mouseover", (e, d) => showTooltip(e, `<strong>${d.data.name}</strong><br>Value: ${d.data.value}`))
+                .on("mouseout", hideTooltip);
+            
+            leaf.append("text")
+                .attr("class", "treemap-text")
+                .attr("x", 4)
+                .attr("y", 16)
+                .text(d => d.data.name);
+        }
+        
+        // View switching
+        function showView(view) {
+            // Update button states
+            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Hide all views
+            document.querySelectorAll('[id$="-view"]').forEach(el => el.style.display = 'none');
+            
+            // Show selected view
+            document.getElementById(view + '-view').style.display = 'block';
+            
+            currentView = view;
+            
+            // Create visualization based on view
+            switch(view) {
+                case 'timeline':
+                    createTimeline();
+                    break;
+                case 'network':
+                    createNetwork();
+                    break;
+                case 'audience':
+                    createAudienceChart();
+                    break;
+                case 'context':
+                    createContextChart();
+                    break;
+            }
+        }
+        
+        // Initialize
+        createTimeline();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            showView(currentView);
+        });
+    </script>
+</body>
+</html>

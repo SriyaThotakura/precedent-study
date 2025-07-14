@@ -1,0 +1,86 @@
+/* Ontologies Table Styling */
+.ontologies-section {
+    margin: 2.5em 0 2em 0;
+    padding: 0;
+    background: linear-gradient(90deg, #e9f7ef 0%, #e0eafc 100%);
+    border-radius: 18px;
+    box-shadow: 0 4px 32px rgba(40,60,90,0.07);
+}
+.ontologies-section .container {
+    padding: 2.5em 1.5em;
+}
+.ontologies-section h2 {
+    font-size: 2.1rem;
+    text-align: center;
+    margin-bottom: 1.5em;
+    letter-spacing: 1px;
+    color: #2c3e50;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+}
+.ontologies-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px #b9c6e0a0;
+    font-size: 1.13rem;
+}
+.ontologies-table th, .ontologies-table td {
+    padding: 1.1em 1.2em;
+    text-align: left;
+    vertical-align: middle;
+}
+.ontologies-table th {
+    background: #2d9c7c;
+    color: #fff;
+    font-size: 1.08em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 4px solid #e0eafc;
+}
+.ontologies-table td {
+    background: #f7fafc;
+    color: #2d3a4a;
+    font-weight: 500;
+    border-bottom: 2px solid #e0eafc;
+    position: relative;
+}
+.ontologies-table tr:last-child td {
+    border-bottom: none;
+}
+.ontologies-table td:first-child {
+    background: #e0eafc;
+    color: #276b4d;
+    font-weight: 700;
+    border-right: 3px solid #d1e7fa;
+    border-radius: 10px 0 0 10px;
+    width: 220px;
+    box-shadow: 2px 0 8px #b9c6e030;
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+}
+.ontologies-table td:first-child::before {
+    content: "\1F7E9";
+    font-size: 1.4em;
+    margin-right: 0.5em;
+    vertical-align: middle;
+}
+.ontologies-table tr:nth-child(even) td {
+    background: #f0f7fa;
+}
+@media (max-width: 700px) {
+    .ontologies-section .container {
+        padding: 1.2em 0.2em;
+    }
+    .ontologies-table th, .ontologies-table td {
+        padding: 0.7em 0.5em;
+        font-size: 0.99em;
+    }
+    .ontologies-section h2 {
+        font-size: 1.2rem;
+    }
+}

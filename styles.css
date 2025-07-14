@@ -164,8 +164,12 @@ nav a:hover {
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(34,34,59,0.08);
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.2s, transform 0.6s cubic-bezier(0.4,0.2,0.2,1);
   border: 2px solid #9a8c98;
+  perspective: 600px;
+}
+.bubble.flipped {
+  transform: rotateY(180deg);
 }
 .bubble.author { background: #f2e9e4; color: #4a4e69; border-color: #c9ada7; }
 .bubble.review { background: #9a8c98; color: #fff; border-color: #4a4e69; }

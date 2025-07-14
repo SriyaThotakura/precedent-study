@@ -57,12 +57,9 @@ function initBubbleAnimations() {
         setTimeout(() => {
             bubble.style.animation = `float ${randomDuration}ms ease-in-out infinite`;
         }, randomDelay);
-        // Add click interaction
+        // Add click interaction for flip
         bubble.addEventListener('click', function() {
-            this.style.transform = 'scale(1.15)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 300);
+            this.classList.toggle('flipped');
         });
     });
 }

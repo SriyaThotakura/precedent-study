@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #2c3e50;
+            color: #ecf0f1;
+        }
+        .ui-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(52, 73, 94, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #34495e;
+            min-width: 250px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .block-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px;
+            background: #34495e;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .block-button:hover {
+            background: #4a6741;
+            transform: translateY(-2px);
+        }
+        .block-button.selected {
+            background: #27ae60;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+        }
+        .block-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .stats {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 6px 8px;
+            background: rgba(44, 62, 80, 0.6);
+            border-radius: 4px;
+        }
+        .resource-positive { color: #2ecc71; }
+        .resource-negative { color: #e74c3c; }
+        .resource-neutral { color: #95a5a6; }
+        .resource-bar {
+            width: 80px;
+            height: 8px;
+            background: #34495e;
+            border-radius: 4px;
+            margin-left: 8px;
+            overflow: hidden;
+        }
+        .resource-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        h3, h4 {
+            margin: 0 0 15px 0;
+            color: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-panel">
+        <h3>🏗️ Block Types</h3>
+        <button class="block-button" onclick="selectBlock('apartment')">
+            <div class="block-icon" style="background: #95a5a6;">🏢</div>
+            <span>Apartment</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('tree')">
+            <div class="block-icon" style="background: #27ae60;">🌳</div>
+            <span>Tree</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('factory')">
+            <div class="block-icon" style="background: #7f8c8d;">🏭</div>
+            <span>Factory</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('solar')">
+            <div class="block-icon" style="background: #f39c12;">☀️</div>
+            <span>Solar Panel</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('water')">
+            <div class="block-icon" style="background: #3498db;">💧</div>
+            <span>Water Tank</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('garden')">
+            <div class="block-icon" style="background: #2ecc71;">🌱</div>
+            <span>Garden</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('waste')">
+            <div class="block-icon" style="background: #8e44ad;">♻️</div>
+            <span>Recycling</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('wind')">
+            <div class="block-icon" style="background: #ecf0f1;">💨</div>
+            <span>Wind Turbine</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('remove')">
+            <div class="block-icon" style="background: #e74c3c;">❌</div>
+            <span>Remove</span>
+        </button>
+        
+        <div class="stats">
+            <h4>🌍 Ecosystem Health</h4>
+            <div class="stat-line">
+                <span>🫁 Oxygen:</span>
+                <span id="oxygen" class="resource-neutral">0</span>
+            </div>
+            <div class="stat-line">
+                <span>⚡ Energy:</span>
+                <span id="energy" class="resource-neutral">0</span>
+            </div>
+            <div class="stat-line">
+                <span>🍎 Food:</span>
+                <span id="food" class="resource-neutral">0</span>
+            </div>
+            <div class="stat-line">
+                <span>💧 Water:</span>
+                <span id="water" class="resource-neutral">0</span>
+            </div>
+            <div class="stat-line">
+                <span>🗑️ Waste:</span>
+                <span id="waste" class="resource-neutral">0</span>
+            </div>
+            <div class="stat-line">
+                <span>👥 Population:</span>
+                <span id="population" class="resource-neutral">0</span>
+            </div>
+            <div class="stat-line">
+                <span>🌿 Sustainability:</span>
+                <span id="sustainability" class="resource-neutral">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let grid = [];
+        let gridSize = 18;
+        let cellSize = 35;
+        let selectedBlock = 'apartment';
+        let resources = {
+            oxygen: 0,
+            energy: 0,
+            food: 0,
+            water: 0,
+            waste: 0,
+            population: 0
+        };
+        
+        let blockTypes = {
+            apartment: {
+                color: [149, 165, 166],
+                darkColor: [100, 110, 111],
+                produces: { population: 2, waste: 1 },
+                consumes: { oxygen: 2, energy: 2, food: 2, water: 1 },
+                symbol: '🏢',
+                name: 'Apartment'
+            },
+            tree: {
+                color: [39, 174, 96],
+                darkColor: [26, 116, 64],
+                produces: { oxygen: 3, food: 1 },
+                consumes: { water: 1 },
+                symbol: '🌳',
+                name: 'Tree'
+            },
+            factory: {
+                color: [127, 140, 141],
+                darkColor: [85, 93, 94],
+                produces: { energy: 4, waste: 3 },
+                consumes: { water: 2 },
+                symbol: '🏭',
+                name: 'Factory'
+            },
+            solar: {
+                color: [243, 156, 18],
+                darkColor: [196, 125, 14],
+                produces: { energy: 3 },
+                consumes: {},
+                symbol: '☀️',
+                name: 'Solar Panel'
+            },
+            water: {
+                color: [52, 152, 219],
+                darkColor: [35, 101, 146],
+                produces: { water: 4 },
+                consumes: {},
+                symbol: '💧',
+                name: 'Water Tank'
+            },
+            garden: {
+                color: [46, 204, 113],
+                darkColor: [31, 136, 75],
+                produces: { food: 3, oxygen: 1 },
+                consumes: { water: 2 },
+                symbol: '🌱',
+                name: 'Garden'
+            },
+            waste: {
+                color: [142, 68, 173],
+                darkColor: [95, 45, 115],
+                produces: { energy: 1 },
+                consumes: { waste: 2 },
+                symbol: '♻️',
+                name: 'Recycling'
+            },
+            wind: {
+                color: [236, 240, 241],
+                darkColor: [189, 195, 199],
+                produces: { energy: 2 },
+                consumes: {},
+                symbol: '💨',
+                name: 'Wind Turbine'
+            }
+        };
+
+        function setup() {
+            createCanvas(900, 700);
+            
+            // Initialize grid
+            for (let x = 0; x < gridSize; x++) {
+                grid[x] = [];
+                for (let y = 0; y < gridSize; y++) {
+                    grid[x][y] = null;
+                }
+            }
+            
+            // Update resources every 1.5 seconds
+            setInterval(updateResources, 1500);
+        }
+
+        function draw() {
+            // Gradient background
+            for (let y = 0; y < height; y++) {
+                let alpha = map(y, 0, height, 0.8, 0.3);
+                stroke(44, 62, 80, alpha * 255);
+                line(0, y, width, y);
+            }
+            
+            // Draw subtle grid
+            stroke(255, 255, 255, 20);
+            strokeWeight(1);
+            for (let x = 0; x <= gridSize; x++) {
+                line(x * cellSize, 0, x * cellSize, gridSize * cellSize);
+            }
+            for (let y = 0; y <= gridSize; y++) {
+                line(0, y * cellSize, gridSize * cellSize, y * cellSize);
+            }
+            
+            // Draw blocks with isometric-style 3D effect
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    if (grid[x][y]) {
+                        drawIsometricBlock(x, y, grid[x][y]);
+                    }
+                }
+            }
+            
+            // Draw hover preview
+            if (mouseX >= 0 && mouseX < gridSize * cellSize && 
+                mouseY >= 0 && mouseY < gridSize * cellSize) {
+                let gridX = Math.floor(mouseX / cellSize);
+                let gridY = Math.floor(mouseY / cellSize);
+                
+                if (selectedBlock !== 'remove' && !grid[gridX][gridY]) {
+                    drawHoverPreview(gridX, gridY);
+                }
+            }
+            
+            // Draw resource flow animations
+            drawResourceFlows();
+        }
+
+        function drawIsometricBlock(x, y, blockType) {
+            let block = blockTypes[blockType];
+            let px = x * cellSize + 3;
+            let py = y * cellSize + 3;
+            let size = cellSize - 6;
+            
+            // Draw shadow
+            fill(0, 0, 0, 50);
+            noStroke();
+            rect(px + 3, py + 3, size, size);
+            
+            // Draw main block face
+            fill(block.color[0], block.color[1], block.color[2]);
+            stroke(255, 255, 255, 100);
+            strokeWeight(1);
+            rect(px, py, size, size);
+            
+            // Draw 3D top face
+            fill(block.color[0] + 20, block.color[1] + 20, block.color[2] + 20);
+            beginShape();
+            vertex(px, py);
+            vertex(px + 8, py - 8);
+            vertex(px + size + 8, py - 8);
+            vertex(px + size, py);
+            endShape(CLOSE);
+            
+            // Draw 3D side face
+            fill(block.darkColor[0], block.darkColor[1], block.darkColor[2]);
+            beginShape();
+            vertex(px + size, py);
+            vertex(px + size + 8, py - 8);
+            vertex(px + size + 8, py + size - 8);
+            vertex(px + size, py + size);
+            endShape(CLOSE);
+            
+            // Draw block symbol
+            fill(255, 255, 255, 200);
+            textAlign(CENTER, CENTER);
+            textSize(18);
+            text(block.symbol, px + size/2, py + size/2);
+            
+            // Draw resource indicators
+            drawResourceIndicators(px, py, size, blockType);
+        }
+
+        function drawHoverPreview(gridX, gridY) {
+            if (selectedBlock === 'remove') return;
+            
+            let block = blockTypes[selectedBlock];
+            let px = gridX * cellSize + 3;
+            let py = gridY * cellSize + 3;
+            let size = cellSize - 6;
+            
+            // Draw preview with transparency
+            fill(block.color[0], block.color[1], block.color[2], 100);
+            stroke(255, 255, 255, 150);
+            strokeWeight(2);
+            rect(px, py, size, size);
+            
+            // Draw preview symbol
+            fill(255, 255, 255, 150);
+            textAlign(CENTER, CENTER);
+            textSize(18);
+            text(block.symbol, px + size/2, py + size/2);
+        }
+
+        function drawResourceIndicators(px, py, size, blockType) {
+            let block = blockTypes[blockType];
+            let indicators = [];
+            
+            // Collect resource changes
+            for (let resource in block.produces) {
+                if (block.produces[resource] > 0) {
+                    indicators.push({ 
+                        type: resource, 
+                        value: block.produces[resource], 
+                        positive: true,
+                        color: getResourceColor(resource)
+                    });
+                }
+            }
+            for (let resource in block.consumes) {
+                if (block.consumes[resource] > 0) {
+                    indicators.push({ 
+                        type: resource, 
+                        value: block.consumes[resource], 
+                        positive: false,
+                        color: getResourceColor(resource)
+                    });
+                }
+            }
+            
+            // Draw indicators as small dots around the block
+            for (let i = 0; i < indicators.length; i++) {
+                let indicator = indicators[i];
+                let angle = (i / indicators.length) * TWO_PI;
+                let radius = size * 0.4;
+                let dotX = px + size/2 + cos(angle) * radius;
+                let dotY = py + size/2 + sin(angle) * radius;
+                
+                // Draw indicator dot
+                fill(indicator.color[0], indicator.color[1], indicator.color[2], 180);
+                noStroke();
+                ellipse(dotX, dotY, 8, 8);
+                
+                // Draw +/- indicator
+                fill(255, 255, 255, 200);
+                textAlign(CENTER, CENTER);
+                textSize(8);
+                text(indicator.positive ? '+' : '-', dotX, dotY);
+            }
+        }
+
+        function getResourceColor(resource) {
+            const colors = {
+                oxygen: [52, 152, 219],
+                energy: [241, 196, 15],
+                food: [39, 174, 96],
+                water: [52, 152, 219],
+                waste: [231, 76, 60],
+                population: [155, 89, 182]
+            };
+            return colors[resource] || [149, 165, 166];
+        }
+
+        function drawResourceFlows() {
+            // Draw animated resource flows between connected blocks
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    if (grid[x][y]) {
+                        drawFlowConnections(x, y);
+                    }
+                }
+            }
+        }
+
+        function drawFlowConnections(x, y) {
+            let block = blockTypes[grid[x][y]];
+            let centerX = x * cellSize + cellSize/2;
+            let centerY = y * cellSize + cellSize/2;
+            
+            // Check adjacent blocks for complementary resources
+            let directions = [
+                {dx: 0, dy: -1}, {dx: 1, dy: 0}, 
+                {dx: 0, dy: 1}, {dx: -1, dy: 0}
+            ];
+            
+            for (let dir of directions) {
+                let nx = x + dir.dx;
+                let ny = y + dir.dy;
+                
+                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize && grid[nx][ny]) {
+                    let neighborBlock = blockTypes[grid[nx][ny]];
+                    let neighborX = nx * cellSize + cellSize/2;
+                    let neighborY = ny * cellSize + cellSize/2;
+                    
+                    // Check if current block produces what neighbor consumes
+                    for (let resource in block.produces) {
+                        if (neighborBlock.consumes[resource]) {
+                            drawFlowLine(centerX, centerY, neighborX, neighborY, getResourceColor(resource));
+                        }
+                    }
+                }
+            }
+        }
+
+        function drawFlowLine(x1, y1, x2, y2, color) {
+            stroke(color[0], color[1], color[2], 100);
+            strokeWeight(2);
+            line(x1, y1, x2, y2);
+            
+            // Draw flow direction arrow
+            let angle = atan2(y2 - y1, x2 - x1);
+            let midX = (x1 + x2) / 2;
+            let midY = (y1 + y2) / 2;
+            
+            push();
+            translate(midX, midY);
+            rotate(angle);
+            fill(color[0], color[1], color[2], 150);
+            noStroke();
+            triangle(0, 0, -8, -3, -8, 3);
+            pop();
+        }
+
+        function mousePressed() {
+            if (mouseX >= 0 && mouseX < gridSize * cellSize && 
+                mouseY >= 0 && mouseY < gridSize * cellSize) {
+                let gridX = Math.floor(mouseX / cellSize);
+                let gridY = Math.floor(mouseY / cellSize);
+                
+                if (selectedBlock === 'remove') {
+                    grid[gridX][gridY] = null;
+                } else if (!grid[gridX][gridY]) {
+                    grid[gridX][gridY] = selectedBlock;
+                }
+            }
+        }
+
+        function selectBlock(blockType) {
+            selectedBlock = blockType;
+            
+            // Update UI
+            document.querySelectorAll('.block-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function updateResources() {
+            // Reset resources
+            resources = {
+                oxygen: 0,
+                energy: 0,
+                food: 0,
+                water: 0,
+                waste: 0,
+                population: 0
+            };
+            
+            // Calculate resource production/consumption
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    if (grid[x][y]) {
+                        let block = blockTypes[grid[x][y]];
+                        
+                        // Add production
+                        for (let resource in block.produces) {
+                            resources[resource] += block.produces[resource];
+                        }
+                        
+                        // Subtract consumption
+                        for (let resource in block.consumes) {
+                            resources[resource] -= block.consumes[resource];
+                        }
+                    }
+                }
+            }
+            
+            // Calculate sustainability score
+            let totalProduction = Math.abs(resources.oxygen) + Math.abs(resources.energy) + 
+                                 Math.abs(resources.food) + Math.abs(resources.water);
+            let negativeResources = Math.max(0, -resources.oxygen) + Math.max(0, -resources.energy) + 
+                                   Math.max(0, -resources.food) + Math.max(0, -resources.water) + 
+                                   Math.max(0, resources.waste);
+            
+            let sustainability = totalProduction > 0 ? 
+                Math.max(0, Math.round(((totalProduction - negativeResources) / totalProduction) * 100)) : 0;
+            
+            // Update UI
+            for (let resource in resources) {
+                let element = document.getElementById(resource);
+                if (element) {
+                    element.textContent = resources[resource];
+                    element.className = resources[resource] > 0 ? 'resource-positive' : 
+                                       resources[resource] < 0 ? 'resource-negative' : 'resource-neutral';
+                }
+            }
+            
+            // Update sustainability
+            let sustElement = document.getElementById('sustainability');
+            if (sustElement) {
+                sustElement.textContent = sustainability + '%';
+                sustElement.className = sustainability > 70 ? 'resource-positive' : 
+                                       sustainability < 30 ? 'resource-negative' : 'resource-neutral';
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            document.querySelector('.block-button').classList.add('selected');
+        };
+    </script>
+</body>
+</html>
