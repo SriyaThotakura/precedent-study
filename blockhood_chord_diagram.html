@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood Game Evolution Chord Diagram</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            font-family: 'Courier New', monospace;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #64ffda;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .chord-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 800px;
+        }
+
+        .game-label {
+            font-size: 16px;
+            font-weight: bold;
+            fill: #e0e0e0;
+            text-shadow: 0 0 10px rgba(224, 224, 224, 0.5);
+        }
+
+        .year-label {
+            font-size: 12px;
+            fill: #888;
+            opacity: 0.8;
+        }
+
+        .feature-label {
+            font-size: 14px;
+            fill: #b0b0b0;
+            opacity: 0.9;
+        }
+
+        .chord-path {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .chord-path:hover {
+            opacity: 1;
+            filter: brightness(1.2);
+        }
+
+        .game-arc {
+            stroke: #333;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+        }
+
+        .game-arc:hover {
+            stroke: #64ffda;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 10px rgba(100, 255, 218, 0.5));
+        }
+
+        .grid-lines {
+            stroke: #333;
+            stroke-width: 1;
+            opacity: 0.3;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #888;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">URBAN SIMULATION EVOLUTION</div>
+        <div class="subtitle">Game Mechanics & Features Flow</div>
+        <div class="chord-container">
+            <svg id="chord-diagram" width="1200" height="800"></svg>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            games: [
+                { name: "The Sims", year: "(2000)", features: ["Simulate domestic suburban life"] },
+                { name: "Minecraft", year: "(2009)", features: ["Creativity through survival and exploration"] },
+                { name: "Cities: Skylines", year: "(2015)", features: ["Procedural city simulation", "Java"] },
+                { name: "NieR: Automata", year: "(2017)", features: ["Urban-planning post-apocalyptic action", "Custom engine"] },
+                { name: "Block'hood", year: "(2017)", features: ["Action combat", "Urban management"] },
+                { name: "Tnuckgens", year: "", features: ["Ecological modular architecture", "Vertical ecological city blocks"] },
+                { name: "Key Mechanics", year: "", features: ["Unity", "Systems ecology"] }
+            ]
+        };
+
+        const svg = d3.select("#chord-diagram");
+        const width = 1200;
+        const height = 800;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = 280;
+
+        // Block'hood inspired color palette
+        const gameColors = [
+            "#ff6b6b", // Warm red
+            "#4ecdc4", // Teal
+            "#45b7d1", // Blue
+            "#96ceb4", // Light green
+            "#feca57", // Yellow
+            "#ff9ff3", // Pink
+            "#54a0ff"  // Blue
+        ];
+
+        const featureColors = [
+            "#a8e6cf", // Light green
+            "#88d8c0", // Mint
+            "#7fcdcd", // Cyan
+            "#81c784", // Green
+            "#aed581", // Light green
+            "#c5e1a5", // Pale green
+            "#dcedc1", // Very light green
+            "#f1f8e9"  // Almost white green
+        ];
+
+        // Create background grid
+        const grid = svg.append("g").attr("class", "grid");
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI) / 4;
+            grid.append("line")
+                .attr("class", "grid-lines")
+                .attr("x1", centerX)
+                .attr("y1", centerY)
+                .attr("x2", centerX + Math.cos(angle) * (radius + 50))
+                .attr("y2", centerY + Math.sin(angle) * (radius + 50));
+        }
+
+        // Create concentric circles
+        for (let r = 100; r <= radius + 50; r += 50) {
+            grid.append("circle")
+                .attr("class", "grid-lines")
+                .attr("cx", centerX)
+                .attr("cy", centerY)
+                .attr("r", r)
+                .attr("fill", "none");
+        }
+
+        // Calculate positions for games (left side, stretched vertically)
+        const gamePositions = data.games.map((game, i) => {
+            const angle = -Math.PI/2 + (i * Math.PI * 1.2) / (data.games.length - 1) - Math.PI/3;
+            return {
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius,
+                angle: angle,
+                ...game
+            };
+        });
+
+        // Calculate positions for features (right side, stretched vertically)
+        const allFeatures = data.games.flatMap(game => game.features);
+        const uniqueFeatures = [...new Set(allFeatures)];
+        const featurePositions = uniqueFeatures.map((feature, i) => {
+            const angle = Math.PI/2 - (i * Math.PI * 1.2) / (uniqueFeatures.length - 1) + Math.PI/3;
+            return {
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius,
+                angle: angle,
+                name: feature
+            };
+        });
+
+        // Create curved paths between games and features
+        const pathGroup = svg.append("g").attr("class", "paths");
+        
+        gamePositions.forEach((game, gameIndex) => {
+            game.features.forEach(feature => {
+                const featurePos = featurePositions.find(f => f.name === feature);
+                if (featurePos) {
+                    const path = d3.path();
+                    path.moveTo(game.x, game.y);
+                    
+                    // Create a smooth curve through the center
+                    const controlX = centerX + (Math.random() - 0.5) * 100;
+                    const controlY = centerY + (Math.random() - 0.5) * 100;
+                    path.quadraticCurveTo(controlX, controlY, featurePos.x, featurePos.y);
+                    
+                    pathGroup.append("path")
+                        .attr("class", "chord-path")
+                        .attr("d", path.toString())
+                        .attr("stroke", gameColors[gameIndex % gameColors.length])
+                        .attr("stroke-width", 3)
+                        .attr("fill", "none")
+                        .attr("opacity", 0.6)
+                        .style("filter", `drop-shadow(0 0 5px ${gameColors[gameIndex % gameColors.length]}40)`);
+                }
+            });
+        });
+
+        // Create game arcs and labels
+        const gameGroup = svg.append("g").attr("class", "games");
+        gamePositions.forEach((game, i) => {
+            const arcRadius = 60;
+            const startAngle = game.angle - 0.3;
+            const endAngle = game.angle + 0.3;
+            
+            const arc = d3.arc()
+                .innerRadius(arcRadius - 15)
+                .outerRadius(arcRadius)
+                .startAngle(startAngle)
+                .endAngle(endAngle);
+
+            gameGroup.append("path")
+                .attr("class", "game-arc")
+                .attr("d", arc)
+                .attr("transform", `translate(${game.x}, ${game.y})`)
+                .attr("fill", gameColors[i % gameColors.length])
+                .style("filter", `drop-shadow(0 0 10px ${gameColors[i % gameColors.length]}60)`);
+
+            // Game name
+            gameGroup.append("text")
+                .attr("class", "game-label")
+                .attr("x", game.x)
+                .attr("y", game.y - 80)
+                .attr("text-anchor", "middle")
+                .text(game.name);
+
+            // Year
+            if (game.year) {
+                gameGroup.append("text")
+                    .attr("class", "year-label")
+                    .attr("x", game.x)
+                    .attr("y", game.y - 60)
+                    .attr("text-anchor", "middle")
+                    .text(game.year);
+            }
+        });
+
+        // Create feature labels
+        const featureGroup = svg.append("g").attr("class", "features");
+        featurePositions.forEach((feature, i) => {
+            const circleRadius = 8;
+            
+            featureGroup.append("circle")
+                .attr("cx", feature.x)
+                .attr("cy", feature.y)
+                .attr("r", circleRadius)
+                .attr("fill", featureColors[i % featureColors.length])
+                .attr("stroke", "#333")
+                .attr("stroke-width", 2)
+                .style("filter", `drop-shadow(0 0 8px ${featureColors[i % featureColors.length]}60)`);
+
+            // Feature text
+            const textAnchor = feature.x > centerX ? "start" : "end";
+            const textX = feature.x + (feature.x > centerX ? 20 : -20);
+            
+            featureGroup.append("text")
+                .attr("class", "feature-label")
+                .attr("x", textX)
+                .attr("y", feature.y + 5)
+                .attr("text-anchor", textAnchor)
+                .text(feature.name);
+        });
+
+        // Add hover effects
+        d3.selectAll(".chord-path").on("mouseover", function(event, d) {
+            d3.select(this).style("opacity", 1).style("stroke-width", 4);
+        }).on("mouseout", function(event, d) {
+            d3.select(this).style("opacity", 0.6).style("stroke-width", 3);
+        });
+    </script>
+</body>
+</html>

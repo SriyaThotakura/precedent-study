@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood Exploded Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: radial-gradient(ellipse at center, #0a0a1a 0%, #000000 70%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .diagram {
+            position: relative;
+            width: 900px;
+            height: 800px;
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+        
+        .platform {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(255,255,255,0.05) 70%);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        
+        .platform:hover {
+            transform: translateZ(50px) scale(1.1);
+            box-shadow: 0 0 100px rgba(138, 43, 226, 0.6);
+        }
+        
+        .platform.active {
+            transform: translateZ(80px) scale(1.15);
+            box-shadow: 0 0 150px rgba(138, 43, 226, 0.8);
+        }
+        
+        /* Level 1 - Core Message (Top) */
+        .level-1 {
+            width: 500px;
+            height: 120px;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(-15deg);
+            border-color: #ff6b6b;
+            background: radial-gradient(ellipse at center, rgba(255, 107, 107, 0.2) 30%, rgba(255, 107, 107, 0.05) 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Level 2 - Arguments & Critical Aspects */
+        .level-2a {
+            width: 400px;
+            height: 100px;
+            top: 200px;
+            left: 150px;
+            transform: rotateX(-10deg) rotateY(-20deg);
+            border-color: #4fc3f7;
+            background: radial-gradient(ellipse at center, rgba(79, 195, 247, 0.2) 30%, rgba(79, 195, 247, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 0.5s;
+        }
+        
+        .level-2b {
+            width: 400px;
+            height: 100px;
+            top: 200px;
+            right: 150px;
+            transform: rotateX(-10deg) rotateY(20deg);
+            border-color: #66bb6a;
+            background: radial-gradient(ellipse at center, rgba(102, 187, 106, 0.2) 30%, rgba(102, 187, 106, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 1s;
+        }
+        
+        /* Level 3 - Sub-components */
+        .level-3a {
+            width: 300px;
+            height: 80px;
+            top: 350px;
+            left: 80px;
+            transform: rotateX(-5deg) rotateY(-30deg);
+            border-color: #29b6f6;
+            background: radial-gradient(ellipse at center, rgba(41, 182, 246, 0.15) 30%, rgba(41, 182, 246, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 1.5s;
+        }
+        
+        .level-3b {
+            width: 300px;
+            height: 80px;
+            top: 350px;
+            right: 80px;
+            transform: rotateX(-5deg) rotateY(30deg);
+            border-color: #43a047;
+            background: radial-gradient(ellipse at center, rgba(67, 160, 71, 0.15) 30%, rgba(67, 160, 71, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 2s;
+        }
+        
+        /* Level 4 - Themes & Implementation */
+        .level-4a {
+            width: 250px;
+            height: 70px;
+            top: 480px;
+            left: 120px;
+            transform: rotateX(0deg) rotateY(-25deg);
+            border-color: #ab47bc;
+            background: radial-gradient(ellipse at center, rgba(171, 71, 188, 0.15) 30%, rgba(171, 71, 188, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 2.5s;
+        }
+        
+        .level-4b {
+            width: 250px;
+            height: 70px;
+            top: 480px;
+            right: 120px;
+            transform: rotateX(0deg) rotateY(25deg);
+            border-color: #ffa726;
+            background: radial-gradient(ellipse at center, rgba(255, 167, 38, 0.15) 30%, rgba(255, 167, 38, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 3s;
+        }
+        
+        /* Level 5 - Core Principles (Bottom) */
+        .level-5 {
+            width: 200px;
+            height: 60px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(10deg);
+            border-color: #e91e63;
+            background: radial-gradient(ellipse at center, rgba(233, 30, 99, 0.15) 30%, rgba(233, 30, 99, 0.05) 70%);
+            animation: float 6s ease-in-out infinite 3.5s;
+        }
+        
+        .platform-content {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .platform-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+        
+        .platform-subtitle {
+            font-size: 0.8em;
+            opacity: 0.8;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* Connection Lines */
+        .connection {
+            position: absolute;
+            background: linear-gradient(to bottom, transparent 0%, rgba(138, 43, 226, 0.6) 50%, transparent 100%);
+            width: 2px;
+            transform-origin: top center;
+            opacity: 0.7;
+            animation: pulse-line 4s ease-in-out infinite;
+        }
+        
+        .conn-1-2a {
+            top: 170px;
+            left: 350px;
+            height: 80px;
+            transform: rotate(-25deg);
+        }
+        
+        .conn-1-2b {
+            top: 170px;
+            right: 350px;
+            height: 80px;
+            transform: rotate(25deg);
+        }
+        
+        .conn-2a-3a {
+            top: 300px;
+            left: 250px;
+            height: 70px;
+            transform: rotate(-20deg);
+        }
+        
+        .conn-2b-3b {
+            top: 300px;
+            right: 250px;
+            height: 70px;
+            transform: rotate(20deg);
+        }
+        
+        .conn-3a-4a {
+            top: 430px;
+            left: 200px;
+            height: 60px;
+            transform: rotate(-15deg);
+        }
+        
+        .conn-3b-4b {
+            top: 430px;
+            right: 200px;
+            height: 60px;
+            transform: rotate(15deg);
+        }
+        
+        .conn-4-5 {
+            top: 550px;
+            left: 50%;
+            height: 80px;
+            transform: translateX(-50%);
+        }
+        
+        /* Side Labels */
+        .side-label {
+            position: absolute;
+            font-size: 0.9em;
+            opacity: 0.6;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            color: #8a2be2;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+        }
+        
+        .left-label {
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .right-label {
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 80%;
+            max-width: 700px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 58, 0.95));
+            border-radius: 20px;
+            padding: 30px;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #8a2be2;
+            backdrop-filter: blur(20px);
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(138, 43, 226, 0.3);
+        }
+        
+        .detail-panel.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .energy-particles {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #8a2be2;
+            border-radius: 50%;
+            animation: particle-flow 8s linear infinite;
+            opacity: 0;
+            box-shadow: 0 0 10px #8a2be2;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotateX(-15deg);
+            }
+            50% {
+                transform: translateY(-20px) rotateX(-15deg);
+            }
+        }
+        
+        @keyframes pulse-line {
+            0%, 100% {
+                opacity: 0.3;
+                box-shadow: 0 0 5px rgba(138, 43, 226, 0.3);
+            }
+            50% {
+                opacity: 0.8;
+                box-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+            }
+        }
+        
+        @keyframes particle-flow {
+            0% {
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(200px);
+            }
+        }
+        
+        .title-header {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .main-title {
+            font-size: 2em;
+            background: linear-gradient(45deg, #8a2be2, #ff6b6b, #4fc3f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1em;
+            opacity: 0.7;
+            color: #8a2be2;
+        }
+        
+        @media (max-width: 768px) {
+            .diagram {
+                width: 100vw;
+                height: 100vh;
+                transform: scale(0.7);
+            }
+            
+            .detail-panel {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-header">
+            <h1 class="main-title">Block'hood Analysis</h1>
+            <div class="subtitle">Rhetorical Framework</div>
+        </div>
+        
+        <div class="diagram">
+            <!-- Level 1: Core Message -->
+            <div class="platform level-1" data-section="core">
+                <div class="platform-content">
+                    <div class="platform-title">CORE MESSAGE</div>
+                    <div class="platform-subtitle">Interconnected Urban Ecosystems</div>
+                </div>
+            </div>
+            
+            <!-- Level 2: Main Arguments -->
+            <div class="platform level-2a" data-section="arguments">
+                <div class="platform-content">
+                    <div class="platform-title">ARGUMENTS</div>
+                    <div class="platform-subtitle">How It Persuades</div>
+                </div>
+            </div>
+            
+            <div class="platform level-2b" data-section="critical">
+                <div class="platform-content">
+                    <div class="platform-title">CRITICAL ASPECTS</div>
+                    <div class="platform-subtitle">Paradigm Challenges</div>
+                </div>
+            </div>
+            
+            <!-- Level 3: Sub-components -->
+            <div class="platform level-3a" data-section="simulation">
+                <div class="platform-content">
+                    <div class="platform-title">SIMULATION</div>
+                    <div class="platform-subtitle">Experience & Learning</div>
+                </div>
+            </div>
+            
+            <div class="platform level-3b" data-section="critique">
+                <div class="platform-content">
+                    <div class="platform-title">CRITIQUE</div>
+                    <div class="platform-subtitle">System Challenges</div>
+                </div>
+            </div>
+            
+            <!-- Level 4: Themes -->
+            <div class="platform level-4a" data-section="themes">
+                <div class="platform-content">
+                    <div class="platform-title">KEY THEMES</div>
+                    <div class="platform-subtitle">Design Philosophy</div>
+                </div>
+            </div>
+            
+            <div class="platform level-4b" data-section="impact">
+                <div class="platform-content">
+                    <div class="platform-title">IMPACT</div>
+                    <div class="platform-subtitle">Knowledge Democracy</div>
+                </div>
+            </div>
+            
+            <!-- Level 5: Foundation -->
+            <div class="platform level-5" data-section="foundation">
+                <div class="platform-content">
+                    <div class="platform-title">FOUNDATION</div>
+                    <div class="platform-subtitle">Systems Thinking</div>
+                </div>
+            </div>
+            
+            <!-- Connection Lines -->
+            <div class="connection conn-1-2a"></div>
+            <div class="connection conn-1-2b"></div>
+            <div class="connection conn-2a-3a"></div>
+            <div class="connection conn-2b-3b"></div>
+            <div class="connection conn-3a-4a"></div>
+            <div class="connection conn-3b-4b"></div>
+            <div class="connection conn-4-5"></div>
+            
+            <!-- Energy Particles -->
+            <div class="energy-particles" style="top: 200px; left: 350px; animation-delay: 0s;"></div>
+            <div class="energy-particles" style="top: 200px; right: 350px; animation-delay: 1s;"></div>
+            <div class="energy-particles" style="top: 350px; left: 250px; animation-delay: 2s;"></div>
+            <div class="energy-particles" style="top: 350px; right: 250px; animation-delay: 3s;"></div>
+        </div>
+        
+        <!-- Side Labels -->
+        <div class="side-label left-label">RHETORICAL STRUCTURE</div>
+        <div class="side-label right-label">SYSTEMS ANALYSIS</div>
+    </div>
+    
+    <!-- Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+        <button class="close-btn" onclick="closeDetail()">&times;</button>
+        <div id="detailContent"></div>
+    </div>
+    
+    <script>
+        const platforms = document.querySelectorAll('.platform');
+        const detailPanel = document.getElementById('detailPanel');
+        const detailContent = document.getElementById('detailContent');
+        
+        const sectionDetails = {
+            core: {
+                title: "🎯 CORE MESSAGE: Living Urban Ecosystems",
+                content: `
+                    <h3 style="color: #ff6b6b; margin-bottom: 20px;">Block'hood's Central Philosophy</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                        <div style="background: rgba(255, 107, 107, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #ff6b6b;">
+                            <h4>🔗 Everything is Interdependent</h4>
+                            <p>No urban element exists in isolation - every decision creates cascading effects throughout the system</p>
+                        </div>
+                        <div style="background: rgba(255, 107, 107, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #ff6b6b;">
+                            <h4>⚖️ Balance is Paramount</h4>
+                            <p>Success isn't about growth or profit, but achieving equilibrium across resource flows</p>
+                        </div>
+                        <div style="background: rgba(255, 107, 107, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #ff6b6b;">
+                            <h4>🔄 Design Prevents Decay</h4>
+                            <p>Without proper care, urban systems naturally deteriorate - conscious design choices are critical</p>
+                        </div>
+                    </div>
+                `
+            },
+            arguments: {
+                title: "💭 ARGUMENTS: Rhetorical Strategies",
+                content: `
+                    <h3 style="color: #4fc3f7; margin-bottom: 20px;">How Block'hood Makes Its Case</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                        <div style="background: rgba(79, 195, 247, 0.1); padding: 20px; border-radius: 15px;">
+                            <h4 style="color: #4fc3f7;">🎮 Simulation & Experience (Pathos & Logos)</h4>
+                            <ul style="margin-top: 10px; line-height: 1.6;">
+                                <li>Direct consequences teach cause-and-effect relationships</li>
+                                <li>Visual feedback shows quantitative resource flows</li>
+                                <li>Emergent complexity demonstrates real urban challenges</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(79, 195, 247, 0.1); padding: 20px; border-radius: 15px;">
+                            <h4 style="color: #4fc3f7;">📊 Limitation & Constraint (Logos)</h4>
+                            <ul style="margin-top: 10px; line-height: 1.6;">
+                                <li>Vertical grid forces density and mixed-use thinking</li>
+                                <li>Resource constraints demand sustainable strategies</li>
+                                <li>No infinite resources - optimization is required</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(79, 195, 247, 0.1); padding: 20px; border-radius: 15px;">
+                            <h4 style="color: #4fc3f7;">🎲 Play & Accessibility (Ethos & Pathos)</h4>
+                            <ul style="margin-top: 10px; line-height: 1.6;">
+                                <li>Makes complex urban planning approachable</li>
+                                <li>Digital LEGOs approach lowers entry barriers</li>
+                                <li>Learning through discovery and experimentation</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            critical: {
+                title: "⚡ CRITICAL ASPECTS: Paradigm Disruption",
+                content: `
+                    <h3 style="color: #66bb6a; margin-bottom: 20px;">Challenging Established Systems</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                        <div style="background: rgba(102, 187, 106, 0.1); padding: 20px; border-radius: 15px;">
+                            <h4 style="color: #66bb6a;">🏙️ Critique of Traditional City-Builders</h4>
+                            <ul style="margin-top: 10px; line-height: 1.6;">
+                                <li><strong>Beyond Growth:</strong> Prioritizes sustainability over economic expansion</li>
+                                <li><strong>Resource Reality:</strong> Makes scarcity and interdependence central</li>
+                                <li><strong>System Focus:</strong> Emphasizes life-supporting infrastructure</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(102, 187, 106, 0.1); padding: 20px; border-radius: 15px;">
+                            <h4 style="color: #66bb6a;">🏛️ Neoliberal Architecture Critique</h4>
+                            <ul style="margin-top: 10px; line-height: 1.6;">
+                                <li><strong>Commons Focus:</strong> Shared resources over private competition</li>
+                                <li><strong>Democratic Design:</strong> Empowers citizens in planning decisions</li>
+                                <li><strong>Systems vs Objects:</strong> Buildings as dynamic system components</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            simulation: {
+                title: "🎮 SIMULATION: Learning Through Experience",
+                content: `
+                    <h3 style="color: #29b6f6; margin-bottom: 20px;">Experiential Learning Mechanics</h3>
+                    <div style="background: rgba(41, 182, 246, 0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <h4 style="color: #29b6f6;">Direct Consequence System</h4>
+                        <p style="line-height: 1.6; margin-top: 10px;">
+                            The game teaches through immediate, tangible results. No water to a tree? It decays. 
+                            Poor waste management? The neighborhood suffers. This creates visceral understanding 
+                            of urban ecosystem dependencies.
+                        </p>
+                    </div>
+                    <div style="background: rgba(41, 182, 246, 0.1); padding: 20px; border-radius: 15px;">
+                        <h4 style="color: #29b6f6;">Emergent Complexity</h4>
+                        <p style="line-height: 1.6; margin-top: 10px;">
+                            Simple input/output rules create surprisingly complex behaviors, demonstrating 
+                            how real urban systems work. Players discover complexity organically rather 
+                            than being overwhelmed by it upfront.
+                        </p>
+                    </div>
+                `
+            },
+            critique: {
+                title: "🎯 CRITIQUE: System-Level Challenges",
+                content: `
+                    <h3 style="color: #43a047; margin-bottom: 20px;">Fundamental Paradigm Shifts</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                        <div style="background: rgba(67, 160, 71, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #43a047;">
+                            <h4>🔄 Decay vs Debt</h4>
+                            <p>Failure represented by ecological breakdown, not financial collapse</p>
+                        </div>
+                        <div style="background: rgba(67, 160, 71, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #43a047;">
+                            <h4>🌱 Beyond Greenwashing</h4>
+                            <p>Demonstrates complex interdependencies required for true sustainability</p>
+                        </div>
+                        <div style="background: rgba(67, 160, 71, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #43a047;">
+                            <h4>⚡ Entropy as Force</h4>
+                            <p>Natural tendency toward disorder requires conscious, continuous effort</p>
+                        </div>
+                    </div>
+                `
+            },
+            themes: {
+                title: "🔗 KEY THEMES: Design Philosophy",
+                content: `
+                    <h3 style="color: #ab47bc; margin-bottom: 20px;">Core Conceptual Framework</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: rgba(171, 71, 188, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                            <h4 style="color: #ab47bc;">🔗 Interdependence</h4>
+                            <p style="font-size: 0.9em; margin-top: 8px;">Every element affects every other through system dynamics</p>
+                        </div>
+                        <div style="background: rgba(171, 71, 188, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                            <h4 style="color: #ab47bc;">⚖️ Balance</h4>
+                            <p style="font-size: 0.9em; margin-top: 8px;">Equilibrium across multiple resource flows</p>
+                        </div>
+                        <div style="background: rgba(171, 71, 188, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                            <h4 style="color: #ab47bc;">🎯 Holistic Design</h4>
+                            <p style="font-size: 0.9em; margin-top: 8px;">Resource management, human needs, ecological impact</p>
+                        </div>
+                    </div>
+                `
+            },
+            impact: {
+                title: "🌟 IMPACT: Democratizing Design Knowledge",
+                content: `
+                    <h3 style="color: #ffa726; margin-bottom: 20px;">Knowledge Accessibility & Empowerment</h3>
+                    <div style="background: rgba(255, 167, 38, 0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <h4 style="color: #ffa726;">Crowdsourced Urbanism</h4>
+                        <p style="line-height: 1.6; margin-top: 10px;">
+                            Block'hood advocates for citizen participation in urban planning. By making complex 
+                            systems understandable, it challenges the notion that design is only for experts.
+                        </p>
+                    </div>
+                    <div style="background: rgba(255, 167, 38, 0.1); padding: 20px; border-radius: 15px;">
+                        <h4 style="color: #ffa726;">Design Literacy for All</h4>
+                        <p style="line-height: 1.6; margin-top: 10px;">
+                            The game serves as a tool to foster understanding of urban systems beyond 
+                            professional circles, empowering communities to shape their environments.
+                        </p>
+                    </div>
+                `
+            },
+            foundation: {
+                title: "🏗️ FOUNDATION: Systems Thinking Principles",
+                content: `
+                    <h3 style="color: #e91e63; margin-bottom: 20px;">Underlying Philosophy</h3>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="display: inline-block; background: rgba(233, 30, 99, 0.1); padding: 20px; border-radius: 50%; border: 2px solid #e91e63;">
+                            <h4 style="color: #e91e63; margin: 0;">Architecture as System</h4>
+                        </div>
+                    </div>
+                    <p style="line-height: 1.6; text-align: center; font-size: 1.1em;">
+                        The fundamental shift from viewing buildings as isolated objects to

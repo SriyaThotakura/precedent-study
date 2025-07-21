@@ -158,9 +158,13 @@
             <button class="control-button" onclick="showView('context')">🌍 Context</button>
         </div>
         <div class="visualization-grid">
-            <div class="chart-container timeline-container" id="timeline-view">
-                <div class="chart-title">Development Timeline & Context</div>
-                <div id="timeline-chart" style="height: 400px;"></div>
+            <div class="chart-container">
+                <div class="chart-title">Development Timeline</div>
+                <div id="timeline-chart"></div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Development Phases</div>
+                <div id="development-table"></div>
             </div>
             <div class="chart-container" id="network-view" style="display: none;">
                 <div class="chart-title">Influence Network</div>
@@ -189,33 +193,49 @@
                 { year: 2016, event: "Urban Population > 50%", category: "context", description: "More than half of world population lives in cities", color: "#4ECDC4" },
                 { year: 2017, event: "Serious Games Rise", category: "context", description: "Educational gaming becomes mainstream", color: "#4ECDC4" }
             ],
-            network: {
-                nodes: [
-                    { id: "blockhood", name: "Block'hood", type: "game", size: 30, color: "#FF6B6B" },
-                    { id: "sanchez", name: "Jose Sanchez", type: "author", size: 25, color: "#FFD93D" },
-                    { id: "cybernetics", name: "Cybernetics", type: "theory", size: 15, color: "#6BCF7F" },
-                    { id: "ecological", name: "Ecological Urbanism", type: "theory", size: 20, color: "#6BCF7F" },
-                    { id: "systems", name: "Systems Thinking", type: "theory", size: 18, color: "#6BCF7F" },
-                    { id: "climate", name: "Climate Crisis", type: "context", size: 22, color: "#4ECDC4" },
-                    { id: "urbanization", name: "Urbanization", type: "context", size: 20, color: "#4ECDC4" },
-                    { id: "simcity", name: "SimCity", type: "game", size: 16, color: "#FF6B6B" },
-                    { id: "minecraft", name: "Minecraft", type: "game", size: 18, color: "#FF6B6B" },
-                    { id: "cities", name: "Cities: Skylines", type: "game", size: 16, color: "#FF6B6B" }
-                ],
-                links: [
-                    { source: "sanchez", target: "blockhood", strength: 10 },
-                    { source: "sanchez", target: "cybernetics", strength: 8 },
-                    { source: "sanchez", target: "ecological", strength: 9 },
-                    { source: "sanchez", target: "systems", strength: 8 },
-                    { source: "blockhood", target: "climate", strength: 7 },
-                    { source: "blockhood", target: "urbanization", strength: 6 },
-                    { source: "blockhood", target: "simcity", strength: 4 },
-                    { source: "blockhood", target: "minecraft", strength: 5 },
-                    { source: "blockhood", target: "cities", strength: 4 },
-                    { source: "ecological", target: "climate", strength: 6 },
-                    { source: "systems", target: "urbanization", strength: 5 }
-                ]
-            },
+            developmentPhases: [
+                { 
+                    time: "Before 2015", 
+                    phase: "Idea & Research", 
+                    details: [
+                        "Game idea born from architecture & ecology studies",
+                        "Focused on systems thinking (everything connected)"
+                    ]
+                },
+                { 
+                    time: "2015 - Early 2016", 
+                    phase: "Building the Core Game", 
+                    details: [
+                        "Chose Unity (game software) to build it",
+                        "Created the block system (like digital LEGOs with rules)",
+                        "Made resources flow between blocks (water, air, trash, etc.)"
+                    ]
+                },
+                { 
+                    time: "March 2016", 
+                    phase: "Early Access Launch", 
+                    details: [
+                        "Let players try it out and give feedback",
+                        "Used feedback to fix problems and add more features (new blocks, challenges)"
+                    ]
+                },
+                { 
+                    time: "May 2017", 
+                    phase: "Full Release", 
+                    details: [
+                        "Finished the main game, including a Story Mode to teach players",
+                        "Became a tool for teaching urban design in schools"
+                    ]
+                },
+                { 
+                    time: "2018 - Now", 
+                    phase: "Learning & Future Plans", 
+                    details: [
+                        "Learned how players build and what works",
+                        "Ideas from Block'hood led to plans for new games (like Common'hood) that let players create even more"
+                    ]
+                }
+            ],
             audience: [
                 { name: "Designers & Urban Planners", value: 35, color: "#FF6B6B", description: "Primary audience for experimentation" },
                 { name: "Educators & Students", value: 30, color: "#FFD93D", description: "Systems thinking advocates" },
@@ -473,8 +493,69 @@
                     break;
             }
         }
+        // Create development phases table
+        function createDevelopmentTable() {
+            const container = d3.select('#development-table');
+            
+            // Create table
+            const table = container.append('table')
+                .style('width', '100%')
+                .style('border-collapse', 'collapse')
+                .style('margin', '20px 0');
+            
+            // Add header
+            const thead = table.append('thead');
+            thead.append('tr')
+                .selectAll('th')
+                .data(['Time Period', 'Development Phase', 'Key Details'])
+                .enter()
+                .append('th')
+                .text(d => d)
+                .style('background', 'rgba(30, 60, 114, 0.8)')
+                .style('color', 'white')
+                .style('padding', '12px')
+                .style('text-align', 'left')
+                .style('border', '1px solid #4a90e2');
+            
+            // Add rows
+            const tbody = table.append('tbody');
+            const rows = tbody.selectAll('tr')
+                .data(data.developmentPhases)
+                .enter()
+                .append('tr')
+                .style('border-bottom', '1px solid #4a90e2');
+            
+            // Time column
+            rows.append('td')
+                .style('padding', '12px')
+                .style('font-weight', 'bold')
+                .style('color', '#4ECDC4')
+                .html(d => d.time);
+            
+            // Phase column
+            rows.append('td')
+                .style('padding', '12px')
+                .style('font-weight', '500')
+                .html(d => d.phase);
+            
+            // Details column with bullet points
+            rows.append('td')
+                .style('padding', '12px')
+                .html(d => {
+                    const bullets = d.details.map(detail => 
+                        `<div style="margin: 5px 0; display: flex; align-items: flex-start;">
+                            <span style="margin-right: 8px;">•</span>
+                            <span>${detail}</span>
+                        </div>`
+                    ).join('');
+                    return bullets;
+                });
+        }
+
         // Initialize
         createTimeline();
+        createDevelopmentTable();
+        
         // Handle window resize
         window.addEventListener('resize', () => {
             showView(currentView);

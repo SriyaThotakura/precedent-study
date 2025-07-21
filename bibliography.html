@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood - Research Bibliography</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom styles for bibliography page */
+        .page-header {
+            background: linear-gradient(135deg, #2a2d3e 0%, #1a1c2b 100%);
+            color: #f2e9e4;
+            padding: 80px 0 60px;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .page-header p {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .block-decoration {
+            position: absolute;
+            opacity: 0.05;
+            font-size: 10rem;
+            z-index: 1;
+        }
+        
+        .block-1 { top: 20px; left: 10%; }
+        .block-2 { bottom: 20px; right: 10%; }
+        
+        .back-to-home {
+            display: inline-block;
+            margin-top: 30px;
+            color: #9a8c98;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .back-to-home:hover {
+            color: #f2e9e4;
+        }
+        
+        .bib-category {
+            margin-bottom: 60px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a4e69;
+        }
+        
+        .category-icon {
+            font-size: 1.8rem;
+            margin-right: 15px;
+            background: #4a4e69;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .category-title {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #f2e9e4;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .category-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .category-icon {
+                margin: 0 0 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Block'hood</a>
+                <nav>
+                    <ul>
+                        <li><a href="index.html#overview">Overview</a></li>
+                        <li><a href="index.html#research">Research</a></li>
+                        <li><a href="index.html#bibliography">Bibliography</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="block-decoration block-1">📚</div>
+        <div class="block-decoration block-2">🏗️</div>
+        <div class="container">
+            <h1>Research Bibliography</h1>
+            <p>A comprehensive collection of interviews, articles, and academic publications about Block'hood and its creator, Jose Sanchez.</p>
+            <a href="index.html" class="back-to-home">← Back to Home</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Interviews & Feature Articles -->
+        <div class="bib-category">
+            <div class="category-header">
+                <div class="category-icon">🎙️</div>
+                <h2 class="category-title">Interviews & Feature Articles</h2>
+            </div>
+            
+            <div class="bibliography">
+                <div class="bib-section">
+                    <div class="bib-item">
+                        <h3>"Block'hood Is a Game About the Beauty—And Dangers—of Urban Sprawl"</h3>
+                        <div class="bib-meta">
+                            <span class="author">Patrick Klepek</span>
+                            <span class="year">2016</span>
+                            <span class="source">
+                                <a href="https://www.vice.com/en/article/8q8nw3/blockhood-is-a-game-about-the-beauty-and-dangers-of-urban-sprawl" target="_blank">Vice - Waypoint</a>
+                            </span>
+                        </div>
+                        <p>An interview with Jose Sanchez about the urban planning concepts behind Block'hood, discussing how the game encourages players to think about sustainable city development and the consequences of unchecked urban expansion.</p>
+                    </div>
+                    
+                    <div class="bib-item">
+                        <h3>"Block'hood: The Architecture of a Video Game"</h3>
+                        <div class="bib-meta">
+                            <span class="author">Jose Sanchez</span>
+                            <span class="year">2016</span>
+                            <span class="source">
+                                <a href="https://www.archdaily.com/784550/blockhood-the-architecture-of-a-video-game" target="_blank">ArchDaily</a>
+                            </span>
+                        </div>
+                        <p>Creator Jose Sanchez explains the architectural principles and ecological systems that form the foundation of Block'hood's gameplay mechanics.</p>
+                    </div>
+                    
+                    <div class="bib-item">
+                        <h3>"Block'hood: A City-Builder About the Fragility of the Environment"</h3>
+                        <div class="bib-meta">
+                            <span class="author">Alex Wiltshire</span>
+                            <span class="year">2017</span>
+                            <span class="source">
+                                <a href="https://www.rockpapershotgun.com/blockhood-preview" target="_blank">Rock, Paper, Shotgun</a>
+                            </span>
+                        </div>
+                        <p>Preview of Block'hood focusing on its unique approach to environmental systems and resource management in urban planning.</p>
+                    </div>
+                    
+                    <div class="view-more">
+                        <button class="btn-view-more" onclick="toggleMore('interviews')">View All Interviews & Articles</button>
+                    </div>
+                    
+                    <div id="more-interviews" style="display: none;">
+                        <!-- Additional interview items would go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Academic & Studio Publications -->
+        <div class="bib-category">
+            <div class="category-header">
+                <div class="category-icon">📚</div>
+                <h2 class="category-title">Academic & Studio Publications</h2>
+            </div>
+            
+            <div class="bibliography">
+                <div class="bib-section">
+                    <div class="bib-item">
+                        <h3>"Block'hood: An Architectural Video Game"</h3>
+                        <div class="bib-meta">
+                            <span class="author">Jose Sanchez</span>
+                            <span class="year">2017</span>
+                            <span class="source">
+                                <a href="https://www.juniperpublishers.com/ctaij/CTAIJ.MS.ID.555626.php" target="_blank">Civil Engineering and Architecture</a>
+                            </span>
+                        </div>
+                        <p>Academic paper exploring the intersection of architecture, urban planning, and game design in the development of Block'hood.</p>
+                    </div>
+                    
+                    <div class="bib-item">
+                        <h3>"Architectural Design Through Gaming: Block'hood as a Pedagogical Tool"</h3>
+                        <div class="bib-meta">
+                            <span class="author">Jose Sanchez, Al Fisher, Daniel Ayat</span>
+                            <span class="year">2018</span>
+                            <span class="source">
+                                <a href="https://www.researchgate.net/publication/327150441_Architectural_Design_Through_Gaming_Block'hood_as_a_Pedagogical_Tool" target="_blank">ResearchGate</a>
+                            </span>
+                        </div>
+                        <p>Examination of how Block'hood has been used in architectural education to teach principles of sustainable design and urban planning.</p>
+                    </div>
+                    
+                    <div class="view-more">
+                        <button class="btn-view-more" onclick="toggleMore('publications')">View All Publications</button>
+                    </div>
+                    
+                    <div id="more-publications" style="display: none;">
+                        <!-- Additional publication items would go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Block'hood Research Project. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        function toggleMore(category) {
+            const moreContent = document.getElementById(`more-${category}`);
+            const button = event.target;
+            
+            if (moreContent.style.display === 'none' || !moreContent.style.display) {
+                moreContent.style.display = 'block';
+                button.textContent = 'Show Less';
+            } else {
+                moreContent.style.display = 'none';
+                button.textContent = 'View More';
+            }
+        }
+    </script>
+</body>
+</html>

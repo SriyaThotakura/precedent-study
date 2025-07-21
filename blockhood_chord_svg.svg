@@ -1,0 +1,216 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="50%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#0f0f0f"/>
+    </linearGradient>
+    
+    <filter id="glow" width="300%" height="300%" x="-100%" y="-100%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1400" height="900" fill="url(#backgroundGradient)"/>
+  
+  <!-- Background Grid -->
+  <g class="grid" opacity="0.2">
+    <!-- Vertical lines -->
+    <line x1="200" y1="100" x2="200" y2="800" stroke="#333" stroke-width="1"/>
+    <line x1="400" y1="100" x2="400" y2="800" stroke="#333" stroke-width="1"/>
+    <line x1="600" y1="100" x2="600" y2="800" stroke="#333" stroke-width="1"/>
+    <line x1="800" y1="100" x2="800" y2="800" stroke="#333" stroke-width="1"/>
+    <line x1="1000" y1="100" x2="1000" y2="800" stroke="#333" stroke-width="1"/>
+    <line x1="1200" y1="100" x2="1200" y2="800" stroke="#333" stroke-width="1"/>
+    
+    <!-- Horizontal lines -->
+    <line x1="100" y1="150" x2="1300" y2="150" stroke="#333" stroke-width="1"/>
+    <line x1="100" y1="250" x2="1300" y2="250" stroke="#333" stroke-width="1"/>
+    <line x1="100" y1="350" x2="1300" y2="350" stroke="#333" stroke-width="1"/>
+    <line x1="100" y1="450" x2="1300" y2="450" stroke="#333" stroke-width="1"/>
+    <line x1="100" y1="550" x2="1300" y2="550" stroke="#333" stroke-width="1"/>
+    <line x1="100" y1="650" x2="1300" y2="650" stroke="#333" stroke-width="1"/>
+    <line x1="100" y1="750" x2="1300" y2="750" stroke="#333" stroke-width="1"/>
+  </g>
+  
+  <!-- Connection Paths -->
+  <g class="paths">
+    <!-- The Sims connections -->
+    <path d="M 320 150 C 450 140, 900 165, 1100 170" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 150 C 460 130, 910 195, 1100 200" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 150 C 470 160, 920 225, 1100 230" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 150 C 480 140, 930 255, 1100 260" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 150 C 490 170, 940 285, 1100 290" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    
+    <!-- Minecraft connections -->
+    <path d="M 320 275 C 450 280, 900 315, 1100 320" stroke="#4ecdc4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 275 C 460 290, 910 345, 1100 350" stroke="#4ecdc4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 275 C 470 270, 920 375, 1100 380" stroke="#4ecdc4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 275 C 480 285, 930 405, 1100 410" stroke="#4ecdc4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 275 C 490 295, 940 435, 1100 440" stroke="#4ecdc4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 275 C 500 280, 950 465, 1100 470" stroke="#4ecdc4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    
+    <!-- Cities: Skylines connections -->
+    <path d="M 320 400 C 450 410, 900 495, 1100 500" stroke="#45b7d1" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 400 C 460 420, 910 525, 1100 530" stroke="#45b7d1" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 400 C 470 400, 920 555, 1100 560" stroke="#45b7d1" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 400 C 480 415, 930 585, 1100 590" stroke="#45b7d1" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 400 C 490 425, 940 615, 1100 620" stroke="#45b7d1" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 400 C 500 410, 950 645, 1100 650" stroke="#45b7d1" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    
+    <!-- NieR: Automata connections -->
+    <path d="M 320 525 C 450 530, 900 675, 1100 680" stroke="#96ceb4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 525 C 460 540, 910 705, 1100 710" stroke="#96ceb4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 525 C 470 520, 920 735, 1100 740" stroke="#96ceb4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 525 C 480 535, 930 765, 1100 770" stroke="#96ceb4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 525 C 490 545, 940 795, 1100 800" stroke="#96ceb4" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    
+    <!-- Block'hood connections -->
+    <path d="M 320 650 C 450 620, 900 175, 1100 180" stroke="#feca57" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 650 C 460 630, 910 205, 1100 210" stroke="#feca57" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 650 C 470 640, 920 235, 1100 240" stroke="#feca57" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 650 C 480 650, 930 265, 1100 270" stroke="#feca57" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+    <path d="M 320 650 C 490 660, 940 295, 1100 300" stroke="#feca57" stroke-width="2" fill="none" opacity="0.7" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Game Blocks -->
+  <g class="games">
+    <!-- The Sims -->
+    <rect x="80" y="115" width="240" height="70" rx="8" ry="8" fill="#ff6b6b" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="200" y="105" text-anchor="middle" font-family="Courier New, monospace" font-size="18" font-weight="bold" fill="#e0e0e0" filter="url(#glow)">The Sims</text>
+    <text x="200" y="135" text-anchor="middle" font-family="Courier New, monospace" font-size="12" fill="#000" font-weight="bold">(2000)</text>
+    <text x="200" y="150" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">Simulate domestic suburban life;</text>
+    <text x="200" y="162" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">explore personal agency</text>
+    <text x="200" y="175" text-anchor="middle" font-family="Courier New, monospace" font-size="9" fill="#000" font-style="italic">Custom engine by Maxis</text>
+    
+    <!-- Minecraft -->
+    <rect x="80" y="240" width="240" height="70" rx="8" ry="8" fill="#4ecdc4" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="200" y="230" text-anchor="middle" font-family="Courier New, monospace" font-size="18" font-weight="bold" fill="#e0e0e0" filter="url(#glow)">Minecraft</text>
+    <text x="200" y="260" text-anchor="middle" font-family="Courier New, monospace" font-size="12" fill="#000" font-weight="bold">(2009)</text>
+    <text x="200" y="275" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">Creativity through survival and</text>
+    <text x="200" y="287" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">exploration</text>
+    <text x="200" y="300" text-anchor="middle" font-family="Courier New, monospace" font-size="9" fill="#000" font-style="italic">Java (initial), later Bedrock</text>
+    
+    <!-- Cities: Skylines -->
+    <rect x="80" y="365" width="240" height="70" rx="8" ry="8" fill="#45b7d1" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="200" y="355" text-anchor="middle" font-family="Courier New, monospace" font-size="18" font-weight="bold" fill="#e0e0e0" filter="url(#glow)">Cities: Skylines</text>
+    <text x="200" y="385" text-anchor="middle" font-family="Courier New, monospace" font-size="12" fill="#000" font-weight="bold">(2015)</text>
+    <text x="200" y="400" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">Urban planning and traffic</text>
+    <text x="200" y="412" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">simulation</text>
+    <text x="200" y="425" text-anchor="middle" font-family="Courier New, monospace" font-size="9" fill="#000" font-style="italic">Unity</text>
+    
+    <!-- NieR: Automata -->
+    <rect x="80" y="490" width="240" height="70" rx="8" ry="8" fill="#96ceb4" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="200" y="480" text-anchor="middle" font-family="Courier New, monospace" font-size="18" font-weight="bold" fill="#e0e0e0" filter="url(#glow)">NieR: Automata</text>
+    <text x="200" y="510" text-anchor="middle" font-family="Courier New, monospace" font-size="12" fill="#000" font-weight="bold">(2017)</text>
+    <text x="200" y="525" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">Philosophical post-human</text>
+    <text x="200" y="537" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">storytelling; war &amp; identity</text>
+    <text x="200" y="550" text-anchor="middle" font-family="Courier New, monospace" font-size="9" fill="#000" font-style="italic">PlatinumGames' custom engine</text>
+    
+    <!-- Block'hood -->
+    <rect x="80" y="615" width="240" height="70" rx="8" ry="8" fill="#feca57" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="200" y="605" text-anchor="middle" font-family="Courier New, monospace" font-size="18" font-weight="bold" fill="#e0e0e0" filter="url(#glow)">Block'hood</text>
+    <text x="200" y="635" text-anchor="middle" font-family="Courier New, monospace" font-size="12" fill="#000" font-weight="bold">(2017)</text>
+    <text x="200" y="650" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">Ecological awareness through</text>
+    <text x="200" y="662" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#000" font-weight="bold">modular architecture</text>
+    <text x="200" y="675" text-anchor="middle" font-family="Courier New, monospace" font-size="9" fill="#000" font-style="italic">Unity</text>
+  </g>
+  
+  <!-- Feature Points and Labels -->
+  <g class="features">
+    <!-- The Sims Features -->
+    <circle cx="1200" cy="170" r="6" fill="#a8e6cf" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="175" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Needs management</text>
+    
+    <circle cx="1200" cy="200" r="6" fill="#88d8c0" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="205" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Social interaction</text>
+    
+    <circle cx="1200" cy="230" r="6" fill="#7fcdcd" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="235" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Home building</text>
+    
+    <circle cx="1200" cy="260" r="6" fill="#81c784" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="265" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Life stages</text>
+    
+    <circle cx="1200" cy="290" r="6" fill="#aed581" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="295" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">AI-driven characters</text>
+    
+    <!-- Minecraft Features -->
+    <circle cx="1200" cy="320" r="6" fill="#c5e1a5" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="325" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Resource gathering</text>
+    
+    <circle cx="1200" cy="350" r="6" fill="#dcedc1" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="355" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Block placement</text>
+    
+    <circle cx="1200" cy="380" r="6" fill="#f1f8e9" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="385" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Survival</text>
+    
+    <circle cx="1200" cy="410" r="6" fill="#e8f5e8" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="415" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Crafting</text>
+    
+    <circle cx="1200" cy="440" r="6" fill="#d4f4dd" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="445" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Redstone logic</text>
+    
+    <circle cx="1200" cy="470" r="6" fill="#c1f2d1" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="475" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Multiplayer</text>
+    
+    <!-- Cities: Skylines Features -->
+    <circle cx="1200" cy="500" r="6" fill="#aef0c4" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="505" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Zoning</text>
+    
+    <circle cx="1200" cy="530" r="6" fill="#9beeb8" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="535" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Infrastructure</text>
+    
+    <circle cx="1200" cy="560" r="6" fill="#88ecab" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="565" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Traffic management</text>
+    
+    <circle cx="1200" cy="590" r="6" fill="#75ea9f" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="595" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Public services</text>
+    
+    <circle cx="1200" cy="620" r="6" fill="#62e892" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="625" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Economic balancing</text>
+    
+    <circle cx="1200" cy="650" r="6" fill="#4fe686" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="655" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Modding support</text>
+    
+    <!-- NieR: Automata Features -->
+    <circle cx="1200" cy="680" r="6" fill="#3ce479" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="685" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Action combat</text>
+    
+    <circle cx="1200" cy="710" r="6" fill="#29e26d" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="715" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Multi-perspective narrative</text>
+    
+    <circle cx="1200" cy="740" r="6" fill="#16e060" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="745" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Open-world quests</text>
+    
+    <circle cx="1200" cy="770" r="6" fill="#03de54" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="775" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Androids</text>
+    
+    <circle cx="1200" cy="800" r="6" fill="#00dc47" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="805" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Bullet-hell elements</text>
+    
+    <!-- Block'hood Features (connecting back to earlier positions) -->
+    <circle cx="1200" cy="180" r="6" fill="#00da3a" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="185" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Systems thinking</text>
+    
+    <circle cx="1200" cy="210" r="6" fill="#00d82e" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="215" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Resource ecology</text>
+    
+    <circle cx="1200" cy="240" r="6" fill="#00d621" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="245" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Urban modular design</text>
+    
+    <circle cx="1200" cy="270" r="6" fill="#00d415" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="275" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Decay over time</text>
+    
+    <circle cx="1200" cy="300" r="6" fill="#00d208" stroke="#333" stroke-width="2" filter="url(#glow)"/>
+    <text x="1215" y="305" text-anchor="start" font-family="Courier New, monospace" font-size="14" fill="#b0b0b0" opacity="0.9">Sandbox/puzzle</text>
+  </g>
+  
+  <!-- Title -->
+  <text x="700" y="60" text-anchor="middle" font-family="Courier New, monospace" font-size="40" font-weight="bold" fill="#64ffda" filter="url(#glow)">URBAN SIMULATION EVOLUTION</text>
+  <text x="700" y="85" text-anchor="middle" font-family="Courier New, monospace" font-size="19" fill="#888" font-style="italic">Game Mechanics &amp; Features Flow</text>
+</svg>

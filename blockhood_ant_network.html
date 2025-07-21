@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood: Actor-Network Theory Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.5rem;
+            color: #4FC3F7;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: #B0BEC5;
+        }
+
+        .control-group input[type="range"] {
+            width: 150px;
+        }
+
+        .control-group button {
+            background: #4FC3F7;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .control-group button:hover {
+            background: #29B6F6;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+
+        .legend h3 {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: #4FC3F7;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            font-size: 0.8rem;
+            max-width: 200px;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        #network-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .link {
+            stroke-opacity: 0.6;
+            stroke-width: 2;
+        }
+
+        .link-label {
+            font-size: 10px;
+            fill: rgba(255, 255, 255, 0.7);
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .node {
+            cursor: pointer;
+            stroke: rgba(255, 255, 255, 0.8);
+            stroke-width: 2;
+        }
+
+        .node:hover {
+            stroke: #FFD54F;
+            stroke-width: 3;
+        }
+
+        .node-label {
+            fill: white;
+            font-size: 12px;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .highlighted {
+            stroke: #FF6B6B !important;
+            stroke-width: 4 !important;
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            max-width: 250px;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .info-panel h4 {
+            margin: 0 0 10px 0;
+            color: #4FC3F7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Block'hood Network</h1>
+            <p>Actor-Network Theory Visualization</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Simulation Strength:</label>
+                <input type="range" id="strength-slider" min="10" max="300" value="100">
+            </div>
+            <div class="control-group">
+                <label>Link Distance:</label>
+                <input type="range" id="distance-slider" min="20" max="150" value="80">
+            </div>
+            <div class="control-group">
+                <button onclick="centerGraph()">Center</button>
+                <button onclick="toggleLabels()">Toggle Labels</button>
+                <button onclick="resetHighlight()">Clear Highlight</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>Node Types</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF6B6B;"></div>
+                <span>Human Actors</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4ECDC4;"></div>
+                <span>Building Blocks</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #45B7D1;"></div>
+                <span>Resources</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #F7DC6F;"></div>
+                <span>Systemic Actors</span>
+            </div>
+        </div>
+
+        <div class="info-panel" id="info-panel">
+            <h4 id="info-title">Node Info</h4>
+            <p id="info-description"></p>
+            <p id="info-connections"></p>
+        </div>
+
+        <svg id="network-svg"></svg>
+    </div>
+
+    <script>
+        // Data structure for nodes and links
+        const nodes = [
+            // Human Actors
+            { id: "Player", type: "human", group: 1, description: "Central decision-maker who places blocks and manages the city" },
+            { id: "Inhabitants", type: "human", group: 1, description: "Abstract people living in residential blocks" },
+            
+            // Building Blocks
+            { id: "Residential", type: "building", group: 2, description: "Living spaces like apartments and lofts" },
+            { id: "Resource Production", type: "building", group: 2, description: "Blocks that generate resources (solar, water, farms)" },
+            { id: "Processing", type: "building", group: 2, description: "Transform raw materials (bakery, compost, factory)" },
+            { id: "Environmental", type: "building", group: 2, description: "Natural elements (trees, wetlands, grass)" },
+            { id: "Infrastructure", type: "building", group: 2, description: "Connection blocks (corridors, elevators)" },
+            { id: "Commercial", type: "building", group: 2, description: "Service buildings (shops, schools, clinics)" },
+            
+            // Resources
+            { id: "Water", type: "resource", group: 3, description: "Essential liquid resource for life and production" },
+            { id: "Electricity", type: "resource", group: 3, description: "Power for buildings and systems" },
+            { id: "Food", type: "resource", group: 3, description: "Sustenance for inhabitants" },
+            { id: "Waste", type: "resource", group: 3, description: "Byproduct that needs management" },
+            { id: "Clean Air", type: "resource", group: 3, description: "Environmental quality resource" },
+            { id: "Well-being", type: "resource", group: 3, description: "Quality of life measure for inhabitants" },
+            { id: "Money", type: "resource", group: 3, description: "Economic resource for transactions" },
+            { id: "Knowledge", type: "resource", group: 3, description: "Educational and information resource" },
+            
+            // Systemic Actors
+            { id: "Grid", type: "system", group: 4, description: "The vertical spatial structure for block placement" },
+            { id: "Decay", type: "system", group: 4, description: "Entropy force that degrades blocks over time" },
+            { id: "Game Rules", type: "system", group: 4, description: "Underlying logic governing all interactions" },
+            { id: "UI Feedback", type: "system", group: 4, description: "Visual and audio feedback systems" }
+        ];
+
+        const links = [
+            // Player interactions
+            { source: "Player", target: "Residential", type: "constructs", description: "Places residential blocks" },
+            { source: "Player", target: "Resource Production", type: "constructs", description: "Places production blocks" },
+            { source: "Player", target: "Processing", type: "constructs", description: "Places processing blocks" },
+            { source: "Player", target: "Environmental", type: "constructs", description: "Places environmental blocks" },
+            { source: "Player", target: "Infrastructure", type: "constructs", description: "Places infrastructure blocks" },
+            { source: "Player", target: "Commercial", type: "constructs", description: "Places commercial blocks" },
+            { source: "UI Feedback", target: "Player", type: "informs", description: "Provides visual feedback" },
+            
+            // Resource production and consumption
+            { source: "Resource Production", target: "Water", type: "produces", description: "Generates water resources" },
+            { source: "Resource Production", target: "Electricity", type: "produces", description: "Generates electrical power" },
+            { source: "Resource Production", target: "Food", type: "produces", description: "Produces food resources" },
+            { source: "Processing", target: "Food", type: "transforms", description: "Processes raw materials into food" },
+            { source: "Processing", target: "Waste", type: "manages", description: "Processes waste materials" },
+            { source: "Environmental", target: "Clean Air", type: "produces", description: "Improves air quality" },
+            
+            // Resource consumption
+            { source: "Water", target: "Residential", type: "required_by", description: "Essential for residential blocks" },
+            { source: "Water", target: "Environmental", type: "required_by", description: "Needed for plants and trees" },
+            { source: "Electricity", target: "Residential", type: "required_by", description: "Powers residential buildings" },
+            { source: "Electricity", target: "Processing", type: "required_by", description: "Powers processing facilities" },
+            { source: "Food", target: "Inhabitants", type: "consumed_by", description: "Consumed by residents" },
+            { source: "Well-being", target: "Inhabitants", type: "consumed_by", description: "Quality of life for residents" },
+            
+            // Inhabitant interactions
+            { source: "Inhabitants", target: "Residential", type: "lives_in", description: "Inhabit residential blocks" },
+            { source: "Inhabitants", target: "Waste", type: "generates", description: "Produce waste materials" },
+            { source: "Inhabitants", target: "Money", type: "generates", description: "Contribute to economy" },
+            { source: "Commercial", target: "Knowledge", type: "provides", description: "Educational services" },
+            { source: "Commercial", target: "Well-being", type: "provides", description: "Health and social services" },
+            
+            // Systemic relationships
+            { source: "Residential", target: "Grid", type: "occupies", description: "Takes up grid space" },
+            { source: "Resource Production", target: "Grid", type: "occupies", description: "Placed on grid structure" },
+            { source: "Processing", target: "Grid", type: "occupies", description: "Occupies grid positions" },
+            { source: "Environmental", target: "Grid", type: "occupies", description: "Uses grid space" },
+            { source: "Infrastructure", target: "Grid", type: "occupies", description: "Connects grid spaces" },
+            { source: "Commercial", target: "Grid", type: "occupies", description: "Located on grid" },
+            
+            // Decay and entropy
+            { source: "Decay", target: "Residential", type: "degrades", description: "Causes building deterioration" },
+            { source: "Decay", target: "Resource Production", type: "degrades", description: "Reduces production efficiency" },
+            { source: "Decay", target: "Processing", type: "degrades", description: "Impairs processing capability" },
+            { source: "Decay", target: "Environmental", type: "degrades", description: "Environmental degradation" },
+            { source: "Decay", target: "Infrastructure", type: "degrades", description: "Infrastructure breakdown" },
+            { source: "Decay", target: "Commercial", type: "degrades", description: "Service degradation" },
+            
+            // Game system governance
+            { source: "Game Rules", target: "Decay", type: "enforces", description: "Controls decay mechanics" },
+            { source: "Game Rules", target: "Grid", type: "defines", description: "Establishes spatial rules" },
+            { source: "Game Rules", target: "UI Feedback", type: "controls", description: "Manages feedback systems" }
+        ];
+
+        // Color scheme for different node types
+        const colorScheme = {
+            human: "#FF6B6B",
+            building: "#4ECDC4", 
+            resource: "#45B7D1",
+            system: "#F7DC6F"
+        };
+
+        // Link type styles
+        const linkStyles = {
+            constructs: { stroke: "#FF9F43", strokeDasharray: "5,5" },
+            produces: { stroke: "#26de81", strokeDasharray: "none" },
+            consumes: { stroke: "#fd79a8", strokeDasharray: "2,2" },
+            required_by: { stroke: "#fd79a8", strokeDasharray: "2,2" },
+            consumed_by: { stroke: "#fd79a8", strokeDasharray: "2,2" },
+            transforms: { stroke: "#a29bfe", strokeDasharray: "none" },
+            manages: { stroke: "#6c5ce7", strokeDasharray: "none" },
+            lives_in: { stroke: "#ffeaa7", strokeDasharray: "3,3" },
+            generates: { stroke: "#fab1a0", strokeDasharray: "none" },
+            provides: { stroke: "#00b894", strokeDasharray: "none" },
+            occupies: { stroke: "#636e72", strokeDasharray: "1,1" },
+            degrades: { stroke: "#e17055", strokeDasharray: "4,2" },
+            enforces: { stroke: "#2d3436", strokeDasharray: "none" },
+            defines: { stroke: "#2d3436", strokeDasharray: "none" },
+            controls: { stroke: "#2d3436", strokeDasharray: "none" },
+            informs: { stroke: "#74b9ff", strokeDasharray: "2,3" }
+        };
+
+        // SVG setup
+        const svg = d3.select("#network-svg");
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        svg.attr("width", width).attr("height", height);
+
+        // Create groups for links and nodes
+        const linkGroup = svg.append("g").attr("class", "links");
+        const nodeGroup = svg.append("g").attr("class", "nodes");
+
+        // Simulation setup
+        let simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id).distance(80))
+            .force("charge", d3.forceManyBody().strength(-100))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(25));
+
+        // Create links
+        const link = linkGroup.selectAll("line")
+            .data(links)
+            .enter().append("line")
+            .attr("class", "link")
+            .attr("stroke", d => linkStyles[d.type]?.stroke || "#999")
+            .attr("stroke-dasharray", d => linkStyles[d.type]?.strokeDasharray || "none")
+            .attr("marker-end", "url(#arrowhead)");
+
+        // Add arrowhead marker
+        svg.append("defs").append("marker")
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 15)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#999");
+
+        // Create nodes
+        const node = nodeGroup.selectAll("circle")
+            .data(nodes)
+            .enter().append("circle")
+            .attr("class", "node")
+            .attr("r", d => d.type === "human" ? 15 : d.type === "system" ? 12 : 10)
+            .attr("fill", d => colorScheme[d.type])
+            .on("mouseover", handleMouseOver)
+            .on("mouseout", handleMouseOut)
+            .on("click", handleNodeClick)
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        // Create node labels
+        const nodeLabels = nodeGroup.selectAll("text")
+            .data(nodes)
+            .enter().append("text")
+            .attr("class", "node-label")
+            .text(d => d.id)
+            .attr("dy", d => d.type === "human" ? -20 : d.type === "system" ? -17 : -15);
+
+        // Tooltip
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        let labelsVisible = true;
+
+        // Simulation tick function
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+
+            nodeLabels
+                .attr("x", d => d.x)
+                .attr("y", d => d.y);
+        });
+
+        // Event handlers
+        function handleMouseOver(event, d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(`<strong>${d.id}</strong><br/>${d.description}`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        }
+
+        function handleMouseOut(event, d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        }
+
+        function handleNodeClick(event, d) {
+            // Highlight connected nodes
+            const connectedNodeIds = new Set();
+            const connectedLinks = [];
+            
+            links.forEach(link => {
+                if (link.source.id === d.id || link.target.id === d.id) {
+                    connectedNodeIds.add(link.source.id);
+                    connectedNodeIds.add(link.target.id);
+                    connectedLinks.push(link);
+                }
+            });
+
+            // Reset all highlighting
+            node.classed("highlighted", false);
+            link.style("stroke-opacity", 0.6);
+
+            // Highlight connected elements
+            node.classed("highlighted", n => connectedNodeIds.has(n.id));
+            link.style("stroke-opacity", l => connectedLinks.includes(l) ? 1 : 0.2);
+
+            // Show info panel
+            const infoPanel = document.getElementById("info-panel");
+            const infoTitle = document.getElementById("info-title");
+            const infoDescription = document.getElementById("info-description");
+            const infoConnections = document.getElementById("info-connections");
+
+            infoTitle.textContent = d.id;
+            infoDescription.textContent = d.description;
+            infoConnections.textContent = `Connected to ${connectedNodeIds.size - 1} other nodes`;
+            infoPanel.style.display = "block";
+        }
+
+        // Control functions
+        function centerGraph() {
+            simulation.force("center", d3.forceCenter(width / 2, height / 2));
+            simulation.alpha(0.3).restart();
+        }
+
+        function toggleLabels() {
+            labelsVisible = !labelsVisible;
+            nodeLabels.style("opacity", labelsVisible ? 1 : 0);
+        }
+
+        function resetHighlight() {
+            node.classed("highlighted", false);
+            link.style("stroke-opacity", 0.6);
+            document.getElementById("info-panel").style.display = "none";
+        }
+
+        // Control sliders
+        document.getElementById("strength-slider").addEventListener("input", function(e) {
+            const strength = -parseInt(e.target.value);
+            simulation.force("charge", d3.forceManyBody().strength(strength));
+            simulation.alpha(0.3).restart();
+        });
+
+        document.getElementById("distance-slider").addEventListener("input", function(e) {
+            const distance = parseInt(e.target.value);
+            simulation.force("link", d3.forceLink(links).id(d => d.id).distance(distance));
+            simulation.alpha(0.3).restart();
+        });
+
+        // Drag functions
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // Responsive resize
+        window.addEventListener('resize', function() {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            
+            svg.attr("width", newWidth).attr("height", newHeight);
+            simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
+            simulation.alpha(0.3).restart();
+        });
+    </script>
+</body>
+</html>

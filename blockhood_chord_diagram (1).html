@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood Game Evolution Chord Diagram</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            font-family: 'Courier New', monospace;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #64ffda;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .chord-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 800px;
+        }
+
+        .download-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #64ffda;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .download-button:hover {
+            background: #4ecdc4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 25px rgba(100, 255, 218, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #888;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">URBAN SIMULATION EVOLUTION</div>
+        <div class="subtitle">Game Mechanics & Features Flow</div>
+        <div class="chord-container">
+            <svg id="chord-diagram" width="1400" height="900"></svg>
+        </div>
+        <button class="download-button" onclick="downloadPNG()">Download PNG</button>
+    </div>
+
+    <script>
+        const data = {
+            games: [
+                { name: "The Sims", year: "(2000)", features: ["Simulate domestic suburban life"] },
+                { name: "Minecraft", year: "(2009)", features: ["Creativity through survival and exploration"] },
+                { name: "Cities: Skylines", year: "(2015)", features: ["Procedural city simulation", "Java"] },
+                { name: "NieR: Automata", year: "(2017)", features: ["Urban-planning post-apocalyptic action", "Custom engine"] },
+                { name: "Block'hood", year: "(2017)", features: ["Action combat", "Urban management"] },
+                { name: "Tnuckgens", year: "", features: ["Ecological modular architecture", "Vertical ecological city blocks"] },
+                { name: "Key Mechanics", year: "", features: ["Unity", "Systems ecology"] }
+            ]
+        };
+
+        const svg = d3.select("#chord-diagram");
+        const width = 1400;
+        const height = 900;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = 350;
+
+        // Add dark background rectangle
+        svg.append("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("fill", "url(#backgroundGradient)");
+
+        // Create gradient definition
+        const defs = svg.append("defs");
+        const backgroundGradient = defs.append("linearGradient")
+            .attr("id", "backgroundGradient")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%");
+
+        backgroundGradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", "#0a0a0a");
+
+        backgroundGradient.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", "#1a1a1a");
+
+        backgroundGradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "#0f0f0f");
+
+        // Create glow filter
+        const glowFilter = defs.append("filter")
+            .attr("id", "glow")
+            .attr("width", "300%")
+            .attr("height", "300%")
+            .attr("x", "-100%")
+            .attr("y", "-100%");
+
+        glowFilter.append("feGaussianBlur")
+            .attr("stdDeviation", "3")
+            .attr("result", "coloredBlur");
+
+        const feMerge = glowFilter.append("feMerge");
+        feMerge.append("feMergeNode").attr("in", "coloredBlur");
+        feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+        // Block'hood inspired color palette
+        const gameColors = [
+            "#ff6b6b", // Warm red
+            "#4ecdc4", // Teal
+            "#45b7d1", // Blue
+            "#96ceb4", // Light green
+            "#feca57", // Yellow
+            "#ff9ff3", // Pink
+            "#54a0ff"  // Blue
+        ];
+
+        const featureColors = [
+            "#a8e6cf", // Light green
+            "#88d8c0", // Mint
+            "#7fcdcd", // Cyan
+            "#81c784", // Green
+            "#aed581", // Light green
+            "#c5e1a5", // Pale green
+            "#dcedc1", // Very light green
+            "#f1f8e9"  // Almost white green
+        ];
+
+        // Create background grid - linear style
+        const grid = svg.append("g").attr("class", "grid");
+        
+        // Vertical lines
+        for (let x = 200; x < width; x += 200) {
+            grid.append("line")
+                .attr("x1", x)
+                .attr("y1", 100)
+                .attr("x2", x)
+                .attr("y2", height - 100)
+                .attr("stroke", "#333")
+                .attr("stroke-width", 1)
+                .attr("opacity", 0.2);
+        }
+        
+        // Horizontal lines
+        for (let y = 150; y < height; y += 100) {
+            grid.append("line")
+                .attr("x1", 100)
+                .attr("y1", y)
+                .attr("x2", width - 100)
+                .attr("y2", y)
+                .attr("stroke", "#333")
+                .attr("stroke-width", 1)
+                .attr("opacity", 0.2);
+        }
+
+        // Calculate positions for games (left side, vertical distribution)
+        const gamePositions = data.games.map((game, i) => {
+            const y = 150 + (i * (height - 300)) / (data.games.length - 1);
+            return {
+                x: 200,
+                y: y,
+                ...game
+            };
+        });
+
+        // Calculate positions for features (right side, vertical distribution)
+        const allFeatures = data.games.flatMap(game => game.features);
+        const uniqueFeatures = [...new Set(allFeatures)];
+        const featurePositions = uniqueFeatures.map((feature, i) => {
+            const y = 150 + (i * (height - 300)) / (uniqueFeatures.length - 1);
+            return {
+                x: width - 200,
+                y: y,
+                name: feature
+            };
+        });
+
+        // Create curved paths between games and features
+        const pathGroup = svg.append("g").attr("class", "paths");
+        
+        gamePositions.forEach((game, gameIndex) => {
+            game.features.forEach(feature => {
+                const featurePos = featurePositions.find(f => f.name === feature);
+                if (featurePos) {
+                    const path = d3.path();
+                    // Create flowing S-curves between left and right sides
+                    const startX = game.x + 100; // Start from right edge of game
+                    const endX = featurePos.x - 100; // End at left edge of feature
+                    const midX = (startX + endX) / 2;
+                    
+                    // Create control points for smooth S-curve
+                    const control1X = startX + (midX - startX) * 0.7;
+                    const control1Y = game.y + (Math.random() - 0.5) * 50;
+                    const control2X = endX - (endX - midX) * 0.7;
+                    const control2Y = featurePos.y + (Math.random() - 0.5) * 50;
+                    
+                    path.moveTo(startX, game.y);
+                    path.bezierCurveTo(control1X, control1Y, control2X, control2Y, endX, featurePos.y);
+                    
+                    pathGroup.append("path")
+                        .attr("d", path.toString())
+                        .attr("stroke", gameColors[gameIndex % gameColors.length])
+                        .attr("stroke-width", 3)
+                        .attr("fill", "none")
+                        .attr("opacity", 0.8)
+                        .attr("filter", "url(#glow)");
+                }
+            });
+        });
+
+        // Create game blocks and labels
+        const gameGroup = svg.append("g").attr("class", "games");
+        gamePositions.forEach((game, i) => {
+            // Create rectangular blocks instead of arcs
+            gameGroup.append("rect")
+                .attr("x", game.x - 80)
+                .attr("y", game.y - 20)
+                .attr("width", 160)
+                .attr("height", 40)
+                .attr("rx", 8)
+                .attr("ry", 8)
+                .attr("fill", gameColors[i % gameColors.length])
+                .attr("stroke", "#333")
+                .attr("stroke-width", 2)
+                .attr("filter", "url(#glow)");
+
+            // Game name
+            gameGroup.append("text")
+                .attr("x", game.x)
+                .attr("y", game.y - 30)
+                .attr("text-anchor", "middle")
+                .attr("font-family", "Courier New, monospace")
+                .attr("font-size", "16px")
+                .attr("font-weight", "bold")
+                .attr("fill", "#e0e0e0")
+                .attr("filter", "url(#glow)")
+                .text(game.name);
+
+            // Year
+            if (game.year) {
+                gameGroup.append("text")
+                    .attr("x", game.x)
+                    .attr("y", game.y + 5)
+                    .attr("text-anchor", "middle")
+                    .attr("font-family", "Courier New, monospace")
+                    .attr("font-size", "12px")
+                    .attr("fill", "#000")
+                    .attr("font-weight", "bold")
+                    .text(game.year);
+            }
+        });
+
+        // Create feature labels with connection points
+        const featureGroup = svg.append("g").attr("class", "features");
+        featurePositions.forEach((feature, i) => {
+            // Create small connection circles
+            featureGroup.append("circle")
+                .attr("cx", feature.x)
+                .attr("cy", feature.y)
+                .attr("r", 6)
+                .attr("fill", featureColors[i % featureColors.length])
+                .attr("stroke", "#333")
+                .attr("stroke-width", 2)
+                .attr("filter", "url(#glow)");
+
+            // Feature text (left-aligned from the circle)
+            featureGroup.append("text")
+                .attr("x", feature.x + 15)
+                .attr("y", feature.y + 5)
+                .attr("text-anchor", "start")
+                .attr("font-family", "Courier New, monospace")
+                .attr("font-size", "14px")
+                .attr("fill", "#b0b0b0")
+                .attr("opacity", 0.9)
+                .text(feature.name);
+        });
+
+        // Function to download as PNG
+        function downloadPNG() {
+            const svgElement = document.getElementById('chord-diagram');
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 1400;
+            canvas.height = 900;
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'blockhood-chord-diagram.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+            
+            img.src = url;
+        }
+    </script>
+</body>
+</html>

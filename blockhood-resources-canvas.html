@@ -3,187 +3,431 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Temporal Structure of Resources in Block'hood</title>
+  <title>Exploded Layer Structure of Block'hood Resources</title>
   <style>
     body {
-      background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      color: #1e3c72;
+      color: #2d3748;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    h2 {
+    h1 {
       text-align: center;
       margin: 2em 0 1em 0;
-      color: #1e3c72;
-      font-size: 2em;
+      color: #ffffff;
+      font-size: 2.5em;
+      font-weight: 300;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
     }
-    #resource-canvas {
-      display: block;
-      margin: 0 auto 2em auto;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 4px 32px #0001;
-      width: 98vw;
-      max-width: 1100px;
-      height: 480px;
-    }
-    .resource-legend {
+    #visualization-container {
+      perspective: 1200px;
+      perspective-origin: center center;
+      width: 100vw;
+      height: 80vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: 2em;
-      margin: 0.5em auto 2em auto;
-      font-size: 1.1em;
-      flex-wrap: wrap;
-    }
-    .legend-flip {
-      background: transparent;
-      perspective: 600px;
-      width: 82px;
-      height: 52px;
-      margin: 0.5em 0.3em;
-      display: inline-block;
-    }
-    .flip-inner {
+      justify-content: center;
       position: relative;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      transition: transform 0.6s cubic-bezier(.4,2,.6,1);
+    }
+    .layer {
+      position: absolute;
+      width: 800px;
+      height: 200px;
       transform-style: preserve-3d;
+      animation: float 6s ease-in-out infinite;
     }
-    .legend-flip:hover .flip-inner, .legend-flip:focus .flip-inner {
-      transform: rotateY(180deg);
+    .layer.early {
+      transform: translateZ(300px) rotateX(-15deg);
+      animation-delay: 0s;
     }
-    .flip-front, .flip-back {
+    .layer.mid {
+      transform: translateZ(0px) rotateX(-15deg);
+      animation-delay: 2s;
+    }
+    .layer.late {
+      transform: translateZ(-300px) rotateX(-15deg);
+      animation-delay: 4s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateZ(var(--z-offset, 0px)) rotateX(-15deg) translateY(0px); }
+      50% { transform: translateZ(var(--z-offset, 0px)) rotateX(-15deg) translateY(-10px); }
+    }
+    .layer.early { --z-offset: 300px; }
+    .layer.mid { --z-offset: 0px; }
+    .layer.late { --z-offset: -300px; }
+    .layer-platform {
       position: absolute;
       width: 100%;
       height: 100%;
-      backface-visibility: hidden;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 
+        0 20px 40px rgba(0,0,0,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+    .layer-label {
+      position: absolute;
+      top: -50px;
+      left: 20px;
+      font-size: 1.8em;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+    .resources-grid {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      align-items: center;
+      justify-items: center;
+    }
+    .resource-node {
+      width: 100px;
+      height: 80px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .resource-node:hover {
+      transform: translateY(-10px) scale(1.05);
+    }
+    .resource-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 1.5em;
-      font-weight: bold;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px #0001;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
     }
-    .flip-front { font-size: 2em; }
-    .legend-basic .flip-front, .legend-basic .flip-back { background: #b3e5fc; color: #1976d2; }
-    .legend-basicnatural .flip-front, .legend-basicnatural .flip-back { background: #c8e6c9; color: #388e3c; }
-    .legend-intermediate .flip-front, .legend-intermediate .flip-back { background: #fff9c4; color: #bfa700; }
-    .legend-advanced .flip-front, .legend-advanced .flip-back { background: #e1bee7; color: #6a1b9a; }
-    .legend-negative .flip-front, .legend-negative .flip-back { background: #ffcdd2; color: #c62828; }
-    .legend-systemic .flip-front, .legend-systemic .flip-back { background: #cfd8dc; color: #455a64; }
-    .flip-back {
-      transform: rotateY(180deg);
-      font-size: 1em;
-      padding: 0 0.4em;
+    .resource-face.front {
+      transform: translateZ(5px);
     }
-    @media (max-width: 700px) {
-      #resource-canvas { height: 700px; }
-      h2 { font-size: 1.2em; }
-      .legend-flip { width: 64px; height: 40px; }
-      .flip-front, .flip-back { font-size: 1.1em; }
+    .resource-face.back {
+      transform: rotateY(180deg) translateZ(5px);
+      background: rgba(255,255,255,0.95);
+      color: #2d3748;
+    }
+    .resource-icon {
+      font-size: 1.8em;
+      margin-bottom: 5px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .resource-name {
+      font-size: 0.9em;
+      line-height: 1.1;
+    }
+    /* Category colors with glassmorphism effect */
+    .basic {
+      background: linear-gradient(135deg, rgba(179, 229, 252, 0.8) 0%, rgba(129, 199, 245, 0.6) 100%);
+      color: #1976d2;
+      border-color: rgba(25, 118, 210, 0.3);
+    }
+    .basic-natural {
+      background: linear-gradient(135deg, rgba(200, 230, 201, 0.8) 0%, rgba(165, 214, 167, 0.6) 100%);
+      color: #388e3c;
+      border-color: rgba(56, 142, 60, 0.3);
+    }
+    .intermediate {
+      background: linear-gradient(135deg, rgba(255, 249, 196, 0.8) 0%, rgba(255, 241, 118, 0.6) 100%);
+      color: #f57c00;
+      border-color: rgba(245, 124, 0, 0.3);
+    }
+    .advanced {
+      background: linear-gradient(135deg, rgba(225, 190, 231, 0.8) 0%, rgba(206, 147, 216, 0.6) 100%);
+      color: #6a1b9a;
+      border-color: rgba(106, 27, 154, 0.3);
+    }
+    .negative {
+      background: linear-gradient(135deg, rgba(255, 205, 210, 0.8) 0%, rgba(239, 154, 154, 0.6) 100%);
+      color: #c62828;
+      border-color: rgba(198, 40, 40, 0.3);
+    }
+    .systemic {
+      background: linear-gradient(135deg, rgba(207, 216, 220, 0.8) 0%, rgba(176, 190, 197, 0.6) 100%);
+      color: #455a64;
+      border-color: rgba(69, 90, 100, 0.3);
+    }
+    .connection-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .legend {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    @media (max-width: 768px) {
+      .layer { width: 95vw; height: 150px; }
+      .resources-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; }
+      .resource-node { width: 70px; height: 60px; }
+      .resource-icon { font-size: 1.4em; }
+      .resource-name { font-size: 0.8em; }
+      h1 { font-size: 1.8em; }
+      .legend { flex-wrap: wrap; gap: 10px; }
     }
   </style>
 </head>
 <body>
-  <h2>Temporal Structure of Resources in Block'hood</h2>
-  <div class="resource-legend">
-    <div class="legend-flip legend-basic"><div class="flip-inner"><div class="flip-front">🌱</div><div class="flip-back">Basic</div></div></div>
-    <div class="legend-flip legend-basicnatural"><div class="flip-inner"><div class="flip-front">🌿</div><div class="flip-back">Basic/Natural</div></div></div>
-    <div class="legend-flip legend-intermediate"><div class="flip-inner"><div class="flip-front">🔷</div><div class="flip-back">Intermediate</div></div></div>
-    <div class="legend-flip legend-advanced"><div class="flip-inner"><div class="flip-front">✨</div><div class="flip-back">Advanced</div></div></div>
-    <div class="legend-flip legend-negative"><div class="flip-inner"><div class="flip-front">⚠️</div><div class="flip-back">Negative</div></div></div>
-    <div class="legend-flip legend-systemic"><div class="flip-inner"><div class="flip-front">♻️</div><div class="flip-back">Systemic/Decay</div></div></div>
+  <h1>Exploded Layer Structure of Block'hood Resources</h1>
+  
+  <div id="visualization-container">
+    <svg class="connection-lines" width="100%" height="100%">
+      <defs>
+        <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgba(255,255,255,0.1);stop-opacity:1" />
+        </linearGradient>
+      </defs>
+    </svg>
+    
+    <div class="layer early">
+      <div class="layer-platform"></div>
+      <div class="layer-label">EARLY PHASE</div>
+      <div class="resources-grid">
+        <div class="resource-node">
+          <div class="resource-face front basic">
+            <div class="resource-icon">💧</div>
+            <div class="resource-name">Water</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front basic">
+            <div class="resource-icon">⚡</div>
+            <div class="resource-name">Electricity</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front basic-natural">
+            <div class="resource-icon">🌬️</div>
+            <div class="resource-name">Oxygen</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front basic-natural">
+            <div class="resource-icon">🍎</div>
+            <div class="resource-name">Food</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front negative">
+            <div class="resource-icon">🗑️</div>
+            <div class="resource-name">Organic Waste</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front basic">
+            <div class="resource-icon">💰</div>
+            <div class="resource-name">Money</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="layer mid">
+      <div class="layer-platform"></div>
+      <div class="layer-label">MID PHASE</div>
+      <div class="resources-grid">
+        <div class="resource-node">
+          <div class="resource-face front intermediate">
+            <div class="resource-icon">📚</div>
+            <div class="resource-name">Education</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front intermediate">
+            <div class="resource-icon">🎭</div>
+            <div class="resource-name">Leisure</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front intermediate">
+            <div class="resource-icon">👷</div>
+            <div class="resource-name">Labor</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front intermediate">
+            <div class="resource-icon">📦</div>
+            <div class="resource-name">Goods</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front negative">
+            <div class="resource-icon">🚮</div>
+            <div class="resource-name">Waste</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front negative">
+            <div class="resource-icon">🔊</div>
+            <div class="resource-name">Noise</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="layer late">
+      <div class="layer-platform"></div>
+      <div class="layer-label">LATE PHASE</div>
+      <div class="resources-grid">
+        <div class="resource-node">
+          <div class="resource-face front advanced">
+            <div class="resource-icon">🔬</div>
+            <div class="resource-name">Research</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front advanced">
+            <div class="resource-icon">💾</div>
+            <div class="resource-name">Data</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front advanced">
+            <div class="resource-icon">🎨</div>
+            <div class="resource-name">Culture</div>
+          </div>
+        </div>
+        <div class="resource-node">
+          <div class="resource-face front systemic">
+            <div class="resource-icon">⚛️</div>
+            <div class="resource-name">Entropy</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <svg id="resource-canvas"></svg>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color basic"></div>
+      <span>Basic</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color basic-natural"></div>
+      <span>Natural</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color intermediate"></div>
+      <span>Intermediate</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color advanced"></div>
+      <span>Advanced</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color negative"></div>
+      <span>Negative</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color systemic"></div>
+      <span>Systemic</span>
+    </div>
+  </div>
+
   <script>
-    // Resource data in the order of the image
-    const phases = ["Early", "Mid", "Late"];
-    const resources = [
-      { name: "Water", phase: "Early", category: "Basic" },
-      { name: "Electricity", phase: "Early", category: "Basic" },
-      { name: "Oxygen", phase: "Early", category: "Basic/Natural" },
-      { name: "Food", phase: "Early", category: "Basic/Natural" },
-      { name: "Organic Waste", phase: "Early", category: "Negative" },
-      { name: "Money", phase: "Early", category: "Basic" },
-      { name: "Education", phase: "Mid", category: "Intermediate" },
-      { name: "Leisure", phase: "Mid", category: "Intermediate" },
-      { name: "Labor", phase: "Mid", category: "Intermediate" },
-      { name: "Goods", phase: "Mid", category: "Intermediate" },
-      { name: "Waste", phase: "Mid", category: "Negative" },
-      { name: "Noise", phase: "Mid", category: "Negative" },
-      { name: "Research", phase: "Late", category: "Advanced" },
-      { name: "Data", phase: "Late", category: "Advanced" },
-      { name: "Culture", phase: "Late", category: "Advanced" },
-      { name: "Entropy", phase: "Late", category: "Systemic/Decay" },
-    ];
-    const categoryColors = {
-      "Basic": "#b3e5fc",
-      "Basic/Natural": "#c8e6c9",
-      "Intermediate": "#fff9c4",
-      "Advanced": "#e1bee7",
-      "Negative": "#ffcdd2",
-      "Systemic/Decay": "#cfd8dc"
-    };
-    const categoryText = {
-      "Basic": "#1976d2",
-      "Basic/Natural": "#388e3c",
-      "Intermediate": "#bfa700",
-      "Advanced": "#6a1b9a",
-      "Negative": "#c62828",
-      "Systemic/Decay": "#455a64"
-    };
-    // SVG setup
-    const svg = d3.select('#resource-canvas');
-    const width = parseInt(svg.style('width')) || 1100;
-    const height = parseInt(svg.style('height')) || 480;
-    const boxW = 120, boxH = 60, boxGap = 12;
-    const yMap = { Early: 70, Mid: 180, Late: 290 };
-    // Group by phase for horizontal arrangement
-    const phaseGroups = { Early: [], Mid: [], Late: [] };
-    resources.forEach(r => phaseGroups[r.phase].push(r));
-    // Draw phase labels
-    svg.selectAll('.phase-label')
-      .data(phases)
-      .enter().append('text')
-      .attr('class', 'phase-label')
-      .attr('x', 10)
-      .attr('y', d => yMap[d] + boxH/2)
-      .attr('font-size', '1.3em')
-      .attr('fill', '#222')
-      .attr('font-weight', 'bold')
-      .attr('alignment-baseline', 'middle')
-      .text(d => d);
-    // Draw resource boxes
-    let xStart = 80;
-    phases.forEach(phase => {
-      let x = xStart;
-      phaseGroups[phase].forEach((r, i) => {
-        svg.append('rect')
-          .attr('x', x)
-          .attr('y', yMap[phase])
-          .attr('width', boxW)
-          .attr('height', boxH)
-          .attr('rx', 16)
-          .attr('fill', categoryColors[r.category])
-          .attr('stroke', '#888')
-          .attr('stroke-width', 1.5);
-        svg.append('text')
-          .attr('x', x + boxW/2)
-          .attr('y', yMap[phase] + boxH/2)
-          .attr('text-anchor', 'middle')
-          .attr('font-size', '1em')
-          .attr('fill', categoryText[r.category])
-          .attr('alignment-baseline', 'middle')
-          .text(r.name);
-        x += boxW + boxGap;
+    // Add subtle connection lines between layers
+    function drawConnections() {
+      const svg = document.querySelector('.connection-lines');
+      const layers = document.querySelectorAll('.layer');
+      
+      // Create flowing connection lines between layers
+      const connections = [
+        { from: 'early', to: 'mid' },
+        { from: 'mid', to: 'late' }
+      ];
+      
+      connections.forEach((conn, i) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const y1 = 300 + (i * 200);
+        const y2 = y1 + 150;
+        
+        line.setAttribute('d', `M400,${y1} Q450,${y1 + 75} 400,${y2}`);
+        line.setAttribute('stroke', 'url(#connectionGradient)');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('fill', 'none');
+        line.setAttribute('opacity', '0.4');
+        
+        // Animate the line
+        const length = line.getTotalLength();
+        line.style.strokeDasharray = length;
+        line.style.strokeDashoffset = length;
+        line.style.animation = `drawLine 3s ease-in-out ${i * 0.5}s infinite`;
+        
+        svg.appendChild(line);
+      });
+    }
+    
+    // Add CSS animation for line drawing
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes drawLine {
+        0%, 20% { stroke-dashoffset: var(--line-length, 100); opacity: 0; }
+        50% { stroke-dashoffset: 0; opacity: 0.6; }
+        80%, 100% { stroke-dashoffset: calc(-1 * var(--line-length, 100)); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Initialize
+    drawConnections();
+    
+    // Add hover effects for resource nodes
+    document.querySelectorAll('.resource-node').forEach(node => {
+      node.addEventListener('mouseenter', () => {
+        node.style.zIndex = '100';
+      });
+      
+      node.addEventListener('mouseleave', () => {
+        node.style.zIndex = '1';
       });
     });
-    // Legend is handled in HTML below SVG
   </script>
 </body>
 </html>

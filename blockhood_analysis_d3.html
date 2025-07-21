@@ -174,12 +174,11 @@
     <div class="container">
         <div class="header">
             <h1>🏙️ Block'hood: Historical & Contextual Analysis</h1>
-            <p>Interactive D3.js visualization of the game's development context and influences</p>
+            <p>Interactive D3.js visualization of the game's development context</p>
         </div>
         
         <div class="controls">
             <button class="control-button active" onclick="showView('timeline')">📅 Timeline</button>
-            <button class="control-button" onclick="showView('network')">🌐 Network</button>
             <button class="control-button" onclick="showView('audience')">🎯 Audience</button>
             <button class="control-button" onclick="showView('context')">🌍 Context</button>
         </div>
@@ -188,11 +187,6 @@
             <div class="chart-container timeline-container" id="timeline-view">
                 <div class="chart-title">Development Timeline & Context</div>
                 <div id="timeline-chart" style="height: 400px;"></div>
-            </div>
-            
-            <div class="chart-container" id="network-view" style="display: none;">
-                <div class="chart-title">Influence Network</div>
-                <div id="network-chart" style="height: 400px;"></div>
             </div>
             
             <div class="chart-container" id="audience-view" style="display: none;">
@@ -223,34 +217,7 @@
                 { year: 2017, event: "Serious Games Rise", category: "context", description: "Educational gaming becomes mainstream", color: "#4ECDC4" }
             ],
             
-            network: {
-                nodes: [
-                    { id: "blockhood", name: "Block'hood", type: "game", size: 30, color: "#FF6B6B" },
-                    { id: "sanchez", name: "Jose Sanchez", type: "author", size: 25, color: "#FFD93D" },
-                    { id: "cybernetics", name: "Cybernetics", type: "theory", size: 15, color: "#6BCF7F" },
-                    { id: "ecological", name: "Ecological Urbanism", type: "theory", size: 20, color: "#6BCF7F" },
-                    { id: "systems", name: "Systems Thinking", type: "theory", size: 18, color: "#6BCF7F" },
-                    { id: "climate", name: "Climate Crisis", type: "context", size: 22, color: "#4ECDC4" },
-                    { id: "urbanization", name: "Urbanization", type: "context", size: 20, color: "#4ECDC4" },
-                    { id: "simcity", name: "SimCity", type: "game", size: 16, color: "#FF6B6B" },
-                    { id: "minecraft", name: "Minecraft", type: "game", size: 18, color: "#FF6B6B" },
-                    { id: "cities", name: "Cities: Skylines", type: "game", size: 16, color: "#FF6B6B" }
-                ],
-                links: [
-                    { source: "sanchez", target: "blockhood", strength: 10 },
-                    { source: "sanchez", target: "cybernetics", strength: 8 },
-                    { source: "sanchez", target: "ecological", strength: 9 },
-                    { source: "sanchez", target: "systems", strength: 8 },
-                    { source: "blockhood", target: "climate", strength: 7 },
-                    { source: "blockhood", target: "urbanization", strength: 6 },
-                    { source: "blockhood", target: "simcity", strength: 4 },
-                    { source: "blockhood", target: "minecraft", strength: 5 },
-                    { source: "blockhood", target: "cities", strength: 4 },
-                    { source: "ecological", target: "climate", strength: 6 },
-                    { source: "systems", target: "urbanization", strength: 5 }
-                ]
-            },
-            
+
             audience: [
                 { name: "Designers & Urban Planners", value: 35, color: "#FF6B6B", description: "Primary audience for experimentation" },
                 { name: "Educators & Students", value: 30, color: "#FFD93D", description: "Systems thinking advocates" },
@@ -533,32 +500,24 @@
         
         // View switching
         function showView(view) {
-            // Update button states
-            document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
             // Hide all views
-            document.querySelectorAll('[id$="-view"]').forEach(el => el.style.display = 'none');
+            d3.selectAll('.chart-container').style('display', 'none');
+            d3.selectAll('.control-button').classed('active', false);
             
             // Show selected view
-            document.getElementById(view + '-view').style.display = 'block';
+            d3.select(`#${view}-view`).style('display', 'block');
+            d3.select(`button[onclick*="${view}"]`).classed('active', true);
             
+            // Update current view
             currentView = view;
             
-            // Create visualization based on view
-            switch(view) {
-                case 'timeline':
-                    createTimeline();
-                    break;
-                case 'network':
-                    createNetwork();
-                    break;
-                case 'audience':
-                    createAudienceChart();
-                    break;
-                case 'context':
-                    createContextChart();
-                    break;
+            // Resize visualization if needed
+            if (view === 'timeline') {
+                createTimeline();
+            } else if (view === 'audience') {
+                createAudienceChart();
+            } else if (view === 'context') {
+                createContextChart();
             }
         }
         

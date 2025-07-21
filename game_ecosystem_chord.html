@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Ecosystem Network - Directed Chord Diagram</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            color: #ffffff;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            text-align: center;
+        }
+        
+        .chord-container {
+            position: relative;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            border: 1px solid #444;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .chord-path {
+            fill-opacity: 0.6;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .chord-path:hover {
+            fill-opacity: 0.9;
+            stroke: rgba(255, 255, 255, 0.5);
+            stroke-width: 1;
+        }
+        
+        .arc-path {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .arc-path:hover {
+            stroke: rgba(255, 255, 255, 0.7);
+            stroke-width: 2;
+        }
+        
+        .arc-label {
+            font-size: 11px;
+            font-weight: 500;
+            fill: white;
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #444;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+        
+        .convergence-note {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            max-width: 200px;
+            border: 1px solid #444;
+            opacity: 0.9;
+        }
+        
+        .fade {
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">GAME ECOSYSTEM NETWORK ANALYSIS</div>
+        <div class="subtitle">Interactive Systems Mapping - Directed Flow Visualization</div>
+        
+        <div class="chord-container">
+            <svg id="chord-diagram"></svg>
+            <div class="tooltip"></div>
+        </div>
+        
+        <div class="legend">
+            <div><strong>Node Types:</strong></div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff6b6b;"></div>
+                <span>Games</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4ecdc4;"></div>
+                <span>Core Systems</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #45b7d1;"></div>
+                <span>Network Flows</span>
+            </div>
+        </div>
+        
+        <div class="convergence-note">
+            <strong>Convergence Point:</strong><br>
+            Block'hood represents the synthesis of micro-management, resource flow, and ecological thinking
+        </div>
+    </div>
+
+    <script>
+        // Game ecosystem network data
+        const gameData = {
+            nodes: [
+                // Games
+                {id: "THE_SIMS", name: "The Sims", type: "game", category: "Life Simulation"},
+                {id: "CITIES SKYLINE", name: "Cities Skylines", type: "game", category: "Urban Planning"},
+                {id: "MINECRAFT", name: "Minecraft", type: "game", category: "Sandbox Builder"},
+                {id: "NIER", name: "Nier", type: "game", category: "Existential RPG"},
+                {id: "BLOCKHOOD", name: "Block'hood", type: "game", category: "Eco-Systems"},
+                {id: "WORLD_GAME", name: "World Game", type: "game", category: "Global Strategy"},
+                
+                // Core Systems
+                {id: "POPULATION_MGMT", name: "Population Management", type: "system"},
+                {id: "URBAN_PLANNING", name: "Urban Planning", type: "system"},
+                {id: "RESOURCE_CHAINS", name: "Resource Chains", type: "system"},
+                {id: "SYSTEMS_THINKING", name: "Systems Thinking", type: "system"},
+                {id: "EXISTENTIAL_DESIGN", name: "Existential Design", type: "system"},
+                {id: "NEEDS_BALANCE", name: "Needs Balance", type: "system"},
+                
+                // Network Flows
+                {id: "LIFE_SIM", name: "Life Simulation Flow", type: "flow"},
+                {id: "CITY_BUILD", name: "City Building Flow", type: "flow"},
+                {id: "ECO_SYS", name: "Ecosystem Flow", type: "flow"},
+                {id: "SANDBOX", name: "Sandbox Flow", type: "flow"},
+                {id: "NARRATIVE", name: "Narrative Flow", type: "flow"},
+                {id: "STRATEGY", name: "Strategy Flow", type: "flow"}
+            ],
+            
+            connections: [
+                // Game to System connections
+                {source: "THE_SIMS", target: "POPULATION_MGMT", value: 8},
+                {source: "THE_SIMS", target: "NEEDS_BALANCE", value: 9},
+                {source: "CITIES SKYLINE", target: "URBAN_PLANNING", value: 10},
+                {source: "CITIES SKYLINE", target: "SYSTEMS_THINKING", value: 7},
+                {source: "MINECRAFT", target: "RESOURCE_CHAINS", value: 8},
+                {source: "MINECRAFT", target: "SYSTEMS_THINKING", value: 6},
+                {source: "NIER", target: "EXISTENTIAL_DESIGN", value: 9},
+                {source: "NIER", target: "NEEDS_BALANCE", value: 5},
+                {source: "BLOCKHOOD", target: "RESOURCE_CHAINS", value: 10},
+                {source: "BLOCKHOOD", target: "SYSTEMS_THINKING", value: 10},
+                {source: "BLOCKHOOD", target: "URBAN_PLANNING", value: 7},
+                {source: "WORLD_GAME", target: "SYSTEMS_THINKING", value: 9},
+                {source: "WORLD_GAME", target: "POPULATION_MGMT", value: 8},
+                
+                // System to Flow connections
+                {source: "POPULATION_MGMT", target: "LIFE_SIM", value: 8},
+                {source: "NEEDS_BALANCE", target: "LIFE_SIM", value: 7},
+                {source: "URBAN_PLANNING", target: "CITY_BUILD", value: 9},
+                {source: "SYSTEMS_THINKING", target: "ECO_SYS", value: 8},
+                {source: "RESOURCE_CHAINS", target: "SANDBOX", value: 8},
+                {source: "EXISTENTIAL_DESIGN", target: "NARRATIVE", value: 9},
+                {source: "SYSTEMS_THINKING", target: "STRATEGY", value: 7},
+                
+                // Flow convergence to Block'hood
+                {source: "LIFE_SIM", target: "BLOCKHOOD", value: 6},
+                {source: "CITY_BUILD", target: "BLOCKHOOD", value: 7},
+                {source: "ECO_SYS", target: "BLOCKHOOD", value: 9},
+                {source: "SANDBOX", target: "BLOCKHOOD", value: 8},
+                {source: "STRATEGY", target: "BLOCKHOOD", value: 6}
+            ]
+        };
+
+        // Set up dimensions
+        const width = 800;
+        const height = 600;
+        const innerRadius = 180;
+        const outerRadius = 200;
+
+        // Create SVG
+        const svg = d3.select("#chord-diagram")
+            .attr("width", width)
+            .attr("height", height);
+
+        const g = svg.append("g")
+            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+        // Color scales
+        const colorScale = d3.scaleOrdinal()
+            .domain(["game", "system", "flow"])
+            .range(["#ff6b6b", "#4ecdc4", "#45b7d1"]);
+
+        // Create matrix for chord diagram
+        const nodeMap = new Map();
+        gameData.nodes.forEach((node, i) => {
+            nodeMap.set(node.id, i);
+        });
+
+        const matrix = Array(gameData.nodes.length).fill().map(() => Array(gameData.nodes.length).fill(0));
+
+        gameData.connections.forEach(connection => {
+            const sourceIndex = nodeMap.get(connection.source);
+            const targetIndex = nodeMap.get(connection.target);
+            matrix[sourceIndex][targetIndex] = connection.value;
+        });
+
+        // Create chord layout
+        const chord = d3.chord()
+            .padAngle(0.05)
+            .sortSubgroups(d3.descending);
+
+        const chords = chord(matrix);
+
+        // Create arc generator
+        const arc = d3.arc()
+            .innerRadius(innerRadius)
+            .outerRadius(outerRadius);
+
+        // Create ribbon generator
+        const ribbon = d3.ribbon()
+            .radius(innerRadius);
+
+        // Tooltip
+        const tooltip = d3.select(".tooltip");
+
+        // Add gradients
+        const defs = svg.append("defs");
+        
+        gameData.connections.forEach((connection, i) => {
+            const sourceNode = gameData.nodes.find(n => n.id === connection.source);
+            const targetNode = gameData.nodes.find(n => n.id === connection.target);
+            
+            const gradient = defs.append("linearGradient")
+                .attr("id", `gradient-${i}`)
+                .attr("gradientUnits", "userSpaceOnUse");
+                
+            gradient.append("stop")
+                .attr("offset", "0%")
+                .attr("stop-color", colorScale(sourceNode.type));
+                
+            gradient.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", colorScale(targetNode.type));
+        });
+
+        // Add groups (arcs)
+        const group = g.append("g")
+            .selectAll("g")
+            .data(chords.groups)
+            .enter().append("g");
+
+        group.append("path")
+            .attr("class", "arc-path")
+            .attr("d", arc)
+            .attr("fill", d => colorScale(gameData.nodes[d.index].type))
+            .on("mouseover", function(event, d) {
+                const node = gameData.nodes[d.index];
+                
+                // Highlight related chords
+                g.selectAll(".chord-path")
+                    .classed("fade", chord => chord.source.index !== d.index && chord.target.index !== d.index);
+                
+                tooltip.style("opacity", 1)
+                    .html(`<strong>${node.name}</strong><br>Type: ${node.type}<br>${node.category || ""}`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            })
+            .on("mouseout", function() {
+                g.selectAll(".chord-path").classed("fade", false);
+                tooltip.style("opacity", 0);
+            });
+
+        // Add labels
+        group.append("text")
+            .attr("class", "arc-label")
+            .attr("dy", "0.35em")
+            .attr("transform", d => {
+                const angle = (d.startAngle + d.endAngle) / 2;
+                const rotate = (angle * 180 / Math.PI - 90);
+                const radius = outerRadius + 15;
+                return `rotate(${rotate}) translate(${radius},0) ${rotate > 90 ? "rotate(180)" : ""}`;
+            })
+            .attr("text-anchor", d => {
+                const angle = (d.startAngle + d.endAngle) / 2;
+                return (angle * 180 / Math.PI - 90) > 90 ? "end" : "start";
+            })
+            .text(d => gameData.nodes[d.index].name)
+            .style("font-size", "10px");
+
+        // Add chords (ribbons)
+        g.append("g")
+            .selectAll("path")
+            .data(chords)
+            .enter().append("path")
+            .attr("class", "chord-path")
+            .attr("d", ribbon)
+            .attr("fill", (d, i) => {
+                const connectionIndex = gameData.connections.findIndex(conn => 
+                    nodeMap.get(conn.source) === d.source.index && 
+                    nodeMap.get(conn.target) === d.target.index
+                );
+                return `url(#gradient-${connectionIndex})`;
+            })
+            .on("mouseover", function(event, d) {
+                const sourceNode = gameData.nodes[d.source.index];
+                const targetNode = gameData.nodes[d.target.index];
+                const connection = gameData.connections.find(conn => 
+                    nodeMap.get(conn.source) === d.source.index && 
+                    nodeMap.get(conn.target) === d.target.index
+                );
+                
+                // Highlight this chord
+                d3.select(this).style("fill-opacity", 0.9);
+                
+                tooltip.style("opacity", 1)
+                    .html(`<strong>${sourceNode.name}</strong> → <strong>${targetNode.name}</strong><br>Strength: ${connection.value}`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            })
+            .on("mouseout", function() {
+                d3.select(this).style("fill-opacity", 0.6);
+                tooltip.style("opacity", 0);
+            });
+
+        // Add pulsing animation for convergence point (Block'hood)
+        const blockhoodIndex = nodeMap.get("BLOCKHOOD");
+        const blockhoodArc = g.selectAll(".arc-path")
+            .filter((d, i) => d.index === blockhoodIndex);
+        
+        function pulse() {
+            blockhoodArc
+                .transition()
+                .duration(2000)
+                .attr("stroke-width", 3)
+                .attr("stroke", "#ffff00")
+                .attr("stroke-opacity", 0.8)
+                .transition()
+                .duration(2000)
+                .attr("stroke-width", 1)
+                .attr("stroke-opacity", 0.2)
+                .on("end", pulse);
+        }
+        
+        pulse();
+
+    </script>
+</body>
+</html>

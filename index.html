@@ -27,10 +27,10 @@
                 <a href="#" class="logo">Block'hood</a>
                 <nav>
                     <ul>
-                        <li><a href="#overview">Overview</a></li>
-                        <li><a href="#research">Research</a></li>
-                        <li><a href="#bibliography">Bibliography</a></li>
-                        <li><a href="#about">About</a></li>
+                        <li><a href="#academic-publications">Overview</a></li>
+                        <li><a href="#ant-visualization">Bibliography</a></li>
+                        <li><a href="#about">Research</a></li>
+                        <li><a href="http://localhost:8080/blockhood_simulation.html" target="_blank" onclick="window.open('http://localhost:8080/blockhood_simulation.html', '_blank'); return false;">Simulation</a></li>
                     </ul>
                 </nav>
             </div>
@@ -90,56 +90,16 @@
             </div>
         </section>
 
-        <!-- Ontologies Table Start -->
-        <section class="ontologies-section">
-            <div class="container">
-                <h2>Ontologies of Block'hood</h2>
-                <table class="ontologies-table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Examples / Subtypes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Structural Blocks</strong></td>
-                            <td>Apartments, cafes, wind turbines, elevators</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Resources</strong></td>
-                            <td>Electricity, water, food, waste, money</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Agents</strong></td>
-                            <td>Residents, workers, visitors</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Processes</strong></td>
-                            <td>Production, decay, entropy, resource flow</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Environmental</strong></td>
-                            <td>Sunlight, air quality, terrain biome</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Player Actions</strong></td>
-                            <td>Placing, removing, connecting blocks, managing systems</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Abstract Rules</strong></td>
-                            <td>Ecological, economic, social satisfaction, sustainability</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        <!-- Ontologies Table End -->
 
-        <section id="research" class="bubble-section">
+        <!-- Scroll target for navigation -->
+        <div id="bibliography-scroll-target" style="position: absolute; margin-top: -80px;"></div>
+        <section id="bibliography" class="section">
             <div class="container">
-                <h2>Research Visualization</h2>
-                <div class="bubble-container">
+                <h2>Bibliography</h2>
+                <p class="section-subtitle">Explore the building blocks of knowledge about Block'hood's development and impact</p>
+                
+                <!-- Research Visualization Bubbles -->
+                <div class="bubble-container" style="margin: 2em 0 3em;">
                     <div class="bubble-chart">
                         <h3>Author's Work & Research</h3>
                         <div class="bubbles">
@@ -190,91 +150,111 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="bibliography">
+                    <!-- Interviews & Feature Articles Module -->
+                    <div id="interviews-features" class="bib-section">
+                        <div class="module-header">
+                            <div class="module-icon">🎙️</div>
+                            <h3>Interviews & Feature Articles</h3>
+                            <div class="module-count">7 items</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Inside The Game: Building Block'hood</div>
+                            <div class="author">Nerdist</div>
+                            <div class="year">2015</div>
+                            <div class="source"><a href="https://nerdist.com/article/inside-the-game-building-blockwood-with-jose-sanchez/" target="_blank">Read Article</a></div>
+                            <div class="description">Discusses the transition from architecture to game design, the inspiration behind Block'hood (Hong Kong's organic growth), and its role as an educational tool.</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Video Games in Architecture</div>
+                            <div class="author">Dezeen</div>
+                            <div class="year">2016</div>
+                            <div class="source"><a href="https://www.dezeen.com/2016/03/07/jose-sanchez-block-hood-video-game-tools-solve-global-challenges-architecture/" target="_blank">View Article</a></div>
+                            <div class="description">Exploring how games can potentially replace traditional design processes.</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Block'hood Computer Game</div>
+                            <div class="author">Archinect Sessions</div>
+                            <div class="year">2016</div>
+                            <div class="source"><a href="https://onetoone.libsyn.com/32-jose-sanchez-co-creator-of-blockhood-computer-game" target="_blank">Listen to Podcast</a></div>
+                            <div class="description">Discussion about reaching a wide audience beyond urban planners.</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Game Creator Interview</div>
+                            <div class="author">YouTube</div>
+                            <div class="year">2016</div>
+                            <div class="source"><a href="https://www.youtube.com/watch?v=J_U7G1mH_r8" target="_blank">Watch Video</a></div>
+                            <div class="description">Exploring "coexistent" modules for human and animal inhabitants.</div>
+                        </div>
+                        
+
+                    </div>
+                    
+                    <!-- Academic & Studio Publications Module -->
+                    <div id="academic-publications" class="bib-section">
+                        <div class="module-header">
+                            <div class="module-icon">📚</div>
+                            <h3>Academic & Studio Publications</h3>
+                            <div class="module-count">5 items</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Design Manifestos</div>
+                            <div class="author">Jose Sanchez</div>
+                            <div class="year">2016</div>
+                            <div class="source"><a href="https://medium.com/design-manifestos/design-manifestos-jose-sanchez-of-plethora-project-9e0452de6587" target="_blank">Read on Medium</a></div>
+                            <div class="description">Exploring procedural geometry and coding, influenced by games like SimCity and Minecraft, and Object-Oriented Ontology.</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Plethora Project</div>
+                            <div class="author">Jose Sanchez</div>
+                            <div class="source"><a href="https://www.plethora-project.com/writting" target="_blank">Visit Site</a></div>
+                            <div class="description">"Combinatorial Design" and "Discrete Architecture" concepts that go beyond traditional parametric design.</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">From Block'hood to Common'hood</div>
+                            <div class="author">Jose Sanchez</div>
+                            <div class="year">2018</div>
+                            <div class="source"><a href="https://www.common-hood.com/blog/2018/11/17/from-blockhood-to-commonhood" target="_blank">Read Article</a></div>
+                            <div class="description">Drawing inspiration from the Maker Movement and Open Source Ecology.</div>
+                        </div>
+                        
+                        <div class="bib-item">
+                            <div class="title">Architecture for the Commons</div>
+                            <div class="author">Jose Sanchez</div>
+                            <div class="year">2020</div>
+                            <div class="source"><a href="https://www.routledge.com/Architecture-for-the-Commons-Participatory-Systems-in-the-Age-of-Platforms/Sanchez/p/book/9781138362352" target="_blank">View Publication</a></div>
+                            <div class="description">How digital tools can democratize architectural content creation and foster participatory design.</div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+                
+                <div class="bibliography-cta">
+                    <p>Explore more research materials and resources about Block'hood's development and impact.</p>
+                    <a href="blockhood_bibliography.html" class="btn-primary">Block'hood: Appraisals & Criticisms</a>
+                </div>
             </div>
         </section>
 
-        <section id="bibliography" class="section">
+        <!-- Actor-Network Theory Visualization Section -->
+        <section id="ant-visualization" class="section" style="background: #1e3c72; padding: 60px 0;">
             <div class="container">
-                <h2>Bibliography & Research Archive</h2>
-                <div class="bibliography">
-                    <div class="bib-section">
-                        <h3>📝 Author's Publications</h3>
-                        <div class="bib-item">
-                            <div class="title">Block'hood, Developing an Architectural Simulation Video Game</div>
-                            <div class="author">Jose Sanchez</div>
-                            <div class="year">2015</div>
-                            <div class="source"><a href="https://www.academia.edu/17761041/Blockhood_Developing_an_Architectural_Simulation_Video_Game_ECAADE_2015" target="_blank">ECAADE 2015 Conference Proceedings</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">Design Manifestos: Plethora Project</div>
-                            <div class="author">Jose Sanchez</div>
-                            <div class="year">2018</div>
-                            <div class="source"><a href="https://medium.com/design-manifestos/design-manifestos-jose-sanchez-of-plethora-project-9e0452de6587" target="_blank">Medium Design Manifestos</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">Common'hood Development Blog</div>
-                            <div class="author">Jose Sanchez</div>
-                            <div class="year">2018-2019</div>
-                            <div class="source"><a href="https://www.common-hood.com/blog" target="_blank">Plethora Project Blog</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">Block'hood Research Documentation</div>
-                            <div class="author">Jose Sanchez</div>
-                            <div class="year">2017</div>
-                            <div class="source"><a href="https://www.researchgate.net/publication/367694869_Block'hood_-_Developing_an_Architectural_Simulation_Video_Game" target="_blank">ResearchGate Publication</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">Architectural Gaming: Speculation and Critique</div>
-                            <div class="author">Jose Sanchez</div>
-                            <div class="year">2016</div>
-                            <div class="source">Academia.edu</div>
-                        </div>
-                    </div>
-                    <div class="bib-section">
-                        <h3>🔍 External Reviews & Analysis</h3>
-                        <div class="bib-item">
-                            <div class="title">Jose Sanchez on Video Games and Architecture</div>
-                            <div class="author">Architect Magazine</div>
-                            <div class="year">2016</div>
-                            <div class="source"><a href="https://www.architectmagazine.com/person/jose-sanchez" target="_blank">Architect Magazine Podcast</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">USC Professor Gamifies Urban Planning</div>
-                            <div class="author">USC Today</div>
-                            <div class="year">2023</div>
-                            <div class="source"><a href="https://today.usc.edu/usc-architecture-professor-gamifies-urban-planning-with-award-winning-video-game/" target="_blank">USC Today Feature</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">Video games will become tools to solve architecture challenges</div>
-                            <div class="author">Dezeen</div>
-                            <div class="year">2016</div>
-                            <div class="source"><a href="https://www.dezeen.com/2016/03/07/jose-sanchez-block-hood-video-game-tools-solve-global-challenges-architecture/" target="_blank">Dezeen Architecture Review</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">'Blockhood' is a beautiful game about eco-architecture</div>
-                            <div class="author">Engadget</div>
-                            <div class="year">2016</div>
-                            <div class="source"><a href="https://www.engadget.com/2016-04-27-blockhood-plethora-project-neighborhood-building-simulator.html" target="_blank">Engadget Gaming Review</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">Block'hood: The Neighborhood Building Game</div>
-                            <div class="author">ArchDaily</div>
-                            <div class="year">2017</div>
-                            <div class="source"><a href="https://www.archdaily.com/783538/blockhood-the-neighborhood-building-game-that-will-test-your-urban-and-architectural-prowess" target="_blank">ArchDaily Analysis</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">When an architect designs a video game, you get Block'hood</div>
-                            <div class="author">Game Developer</div>
-                            <div class="year">2023</div>
-                            <div class="source"><a href="https://www.gamedeveloper.com/design/when-an-architect-designs-a-video-game-you-get-i-block-hood-i-" target="_blank">Game Developer Magazine</a></div>
-                        </div>
-                        <div class="bib-item">
-                            <div class="title">The Architecture of Block'hood</div>
-                            <div class="author">Next City</div>
-                            <div class="year">2017</div>
-                            <div class="source"><a href="https://nextcity.org/urbanist-news/blockhood-architecture-video-game" target="_blank">Next City Urban Planning Review</a></div>
-                        </div>
-                    </div>
+                <h2 style="color: white;">Ontologies of Block'hood</h2>
+                <p class="section-subtitle" style="color: rgba(255, 255, 255, 0.8); margin-bottom: 30px;">Interactive visualization of the actor-network relationships in Block'hood</p>
+                <div style="width: 100%; height: 70vh; background: rgba(0, 0, 0, 0.2); border-radius: 12px; overflow: hidden; position: relative;">
+                    <iframe src="blockhood_ant_network.html" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Drag nodes to explore connections. Click on any node for more details.</p>
                 </div>
             </div>
         </section>
@@ -319,6 +299,15 @@
     </section>
 
     <!-- Block'hood Visual & Aesthetic Analysis Canvas -->
+    <!-- Game Ecosystem Chord Diagram -->
+    <section class="game-ecosystem-section" style="margin-top: 3em; background: #1a1a2e; padding: 60px 0;">
+        <div class="container">
+            <h2 style="text-align:center; color:#ffffff; margin-bottom:1em; font-size:2em;">Game Ecosystem Network Analysis</h2>
+            <p style="text-align:center; color:rgba(255,255,255,0.8); margin-bottom:2em;">Interactive Systems Mapping - Directed Flow Visualization</p>
+            <iframe src="game_ecosystem_chord.html" style="width:100%; height:800px; border:none; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.3);"></iframe>
+        </div>
+    </section>
+
     <section class="blockhood-visual-canvas-section" style="margin-top: 3em;">
         <div class="container">
             <h2 style="text-align:center; color:#4CAF50; margin-bottom:1em; font-size:2em;">Block'hood Visual & Aesthetic Analysis</h2>
@@ -329,7 +318,7 @@
     <!-- Block'hood UML Class Diagram Canvas -->
     <section class="blockhood-uml-canvas-section" style="margin-top: 3em;">
         <div class="container">
-            <h2 style="text-align:center; color:#1e3c72; margin-bottom:1em; font-size:2em;">Block'hood UML Class Diagram</h2>
+            <h2 style="text-align:center; color:#1e3c72; margin-bottom:1em; font-size:2em;">Logic</h2>
             <iframe src="blockhood-uml-canvas.html" style="width:100%; min-height:1100px; border:none; border-radius:16px; box-shadow:0 4px 32px #0002; background:white;"></iframe>
         </div>
     </section>

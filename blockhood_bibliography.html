@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block'hood: Appraisals and Criticisms</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 20px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(45deg, #ee5a52, #ff9ff3);
+        }
+
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .section.active .section-content {
+            max-height: 2000px;
+            padding: 30px;
+        }
+
+        .section.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .article {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .article-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .article-link {
+            display: inline-block;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            padding: 5px 12px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .article-link:hover {
+            background: #3498db;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .feedback-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .feedback-box {
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .appraisal {
+            background: rgba(46, 204, 113, 0.1);
+            border-left-color: #2ecc71;
+        }
+
+        .criticism {
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+        }
+
+        .feedback-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .appraisal .feedback-header {
+            color: #27ae60;
+        }
+
+        .criticism .feedback-header {
+            color: #c0392b;
+        }
+
+        .feedback-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .feedback-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .section-header {
+                padding: 15px 20px;
+            }
+            
+            .section.active .section-content {
+                padding: 20px;
+            }
+        }
+
+        .intro-text {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Block'hood: Appraisals & Criticisms</h1>
+            <p>A comprehensive compilation of reviews and analysis of the innovative city-building game</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">10+</span>
+                    <span>Reviews Analyzed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">3</span>
+                    <span>Categories</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">2016</span>
+                    <span>Release Year</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="intro-text">
+            <p><strong>About this compilation:</strong> This collection provides insights into how Block'hood has been received across different communities - from gaming media to academic institutions. The game, developed by Jose Sanchez and Plethora-Project, represents an innovative approach to city-building that focuses on ecological balance and interdependencies rather than traditional economic systems.</p>
+        </div>
+
+        <div class="section active">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🎮 Game Reviews & Industry Appraisals</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="article">
+                    <div class="article-title">Metacritic Reviews (Aggregated Critic & User Scores)</div>
+                    <a href="https://www.metacritic.com/game/blockhood/" class="article-link" target="_blank">Visit Metacritic Page</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Praised for unique concept, charming visuals, relaxing music, and innovative approach focusing on ecological balance. Highlighted for puzzle-like challenges and educational potential.</div>
+                        </div>
+                        <div class="feedback-box criticism">
+                            <div class="feedback-header">✗ Criticisms</div>
+                            <div class="feedback-text">Clunky controls, steep learning curve, lack of clear progression in sandbox mode, technical issues, and perceived lack of depth compared to traditional city-builders.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article">
+                    <div class="article-title">"Premature Evaluation: Block'hood" - Rock Paper Shotgun</div>
+                    <a href="https://www.rockpapershotgun.com/blockhood-preview" class="article-link" target="_blank">Read Full Review</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Commends unique vertical resource management challenge and "ship in a bottle" quality. Appreciates potential for thoughtful, deliberate gameplay.</div>
+                        </div>
+                        <div class="feedback-box criticism">
+                            <div class="feedback-header">✗ Criticisms</div>
+                            <div class="feedback-text">Highlights "nightmarish" experience of fixing resource chain breaks, leading to "Ragequit City" moments. Criticizes lack of life with no virtual citizens.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article">
+                    <div class="article-title">"'Blockhood' is a beautiful game about eco-architecture" - Engadget</div>
+                    <a href="https://www.engadget.com/2016-04-27-blockhood-plethora-project-neighborhood-building-simulator.html" class="article-link" target="_blank">Read Full Article</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Describes as "beautiful game" that makes players think about architectural ecology. Acknowledges educational value and potential as a learning tool.</div>
+                        </div>
+                        <div class="feedback-box criticism">
+                            <div class="feedback-header">✗ Criticisms</div>
+                            <div class="feedback-text">Tutorial explains how to play, not how to plan. Limited camera movement with erratic auto-snap. Questions longevity and "lack of endgame."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article">
+                    <div class="article-title">Geeky Hobbies Indie Game Preview</div>
+                    <a href="https://www.geekyhobbies.com/blockhood-indie-game-preview/" class="article-link" target="_blank">Read Preview</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Praises polish for Early Access game and unique take on city-building. Appreciates accessibility despite learning curve and dual function as creative/puzzle game.</div>
+                        </div>
+                        <div class="feedback-box criticism">
+                            <div class="feedback-header">✗ Criticisms</div>
+                            <div class="feedback-text">Learning curve requires time commitment. Occasional issues with precise block placement. Limited sandbox content initially.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🏛️ Academic & Architectural Community</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="article">
+                    <div class="article-title">"Block'hood: The Neighborhood Building Game" - ArchDaily</div>
+                    <a href="https://www.archdaily.com/783538/blockhood-the-neighborhood-building-game-that-will-test-your-urban-and-architectural-prowess" class="article-link" target="_blank">Read Full Article</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Taps into simple desire to play with blocks while adding environmental complexity. Forces users to think about resource management, leading to deeper understanding of urban dynamics. Game constraints provide insights for real dense urban development.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article">
+                    <div class="article-title">Block'hood - Taubman College (University of Michigan)</div>
+                    <a href="https://taubmancollege.umich.edu/project/blockhood/" class="article-link" target="_blank">Visit Project Page</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Highlights numerous awards including "Best Gameplay" at Games for Change, Faculty Design award from ACSA, and best paper award from ACADIA. Framed as significant educational and research initiative bridging games and architecture.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article">
+                    <div class="article-title">"Block'Hood: Can a Video Game Change How We Design a City?"</div>
+                    <a href="https://sociologyofvideogames.com/2016/03/09/blockhood-can-a-video-game-change-how-we-design-a-city/" class="article-link" target="_blank">Read Analysis</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Appraisals</div>
+                            <div class="feedback-text">Explores potential as unique tool for architecture and community planning. Serves as accessible introduction to complex industry concepts. Games can harness gamer curiosity for educational purposes and smarter design decisions.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🌱 Educational & Community Feedback</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="article">
+                    <div class="article-title">Steam Community Discussions</div>
+                    <a href="https://steamcommunity.com/app/416210/discussions/0/" class="article-link" target="_blank">Visit Steam Community</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ User Praise</div>
+                            <div class="feedback-text">Users praise unique concept, relaxing atmosphere, and satisfaction of building self-sustaining neighborhoods. Many find it a great educational tool.</div>
+                        </div>
+                        <div class="feedback-box criticism">
+                            <div class="feedback-header">✗ User Concerns</div>
+                            <div class="feedback-text">Steep learning curve, rapid decay rates causing frustration, desire for better UI/UX (pause button, clearer resource displays), technical bugs, and requests for more animations and visual feedback.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article">
+                    <div class="article-title">"Block'hood – Vertical city simulator" - Creative Applications Network</div>
+                    <a href="https://www.creativeapplications.net/project/blockhood-vertical-city-simulator-with-focus-on-ecology-decay-and-coexistence/" class="article-link" target="_blank">Read Full Coverage</a>
+                    <div class="feedback-section">
+                        <div class="feedback-box appraisal">
+                            <div class="feedback-header">✓ Technical Recognition</div>
+                            <div class="feedback-text">Effectively summarizes core mechanics (ecology, decay, coexistence) and ambition as design/educational tool. Highlights unique cellular automata structure and differentiation from traditional city builders.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            const section = header.parentElement;
+            const allSections = document.querySelectorAll('.section');
+            
+            // Close all other sections
+            allSections.forEach(s => {
+                if (s !== section) {
+                    s.classList.remove('active');
+                }
+            });
+            
+            // Toggle current section
+            section.classList.toggle('active');
+        }
+
+        // Initialize with first section open
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSection = document.querySelector('.section');
+            firstSection.classList.add('active');
+        });
+
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add hover effects to article cards
+        document.querySelectorAll('.article').forEach(article => {
+            article.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            article.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body>
+</html>
