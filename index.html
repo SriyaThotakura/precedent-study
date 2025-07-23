@@ -4,22 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block'hood - Urban Simulation Game Research Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="ontologies-table.css">
 </head>
 <body>
-    <!-- Image Slider Start -->
-    <section class="image-slider-section">
-        <div class="image-slider" id="imageSlider">
-            <!-- Slides will be injected by slider.js -->
-        </div>
-        <div class="slider-nav">
-            <button class="slider-arrow left" id="sliderPrev">&#10094;</button>
-            <div class="slider-dots" id="sliderDots"></div>
-            <button class="slider-arrow right" id="sliderNext">&#10095;</button>
+    <!-- Game Mode Canvases Start -->
+    <section class="game-mode-section">
+        <div class="canvas-container">
+            <div class="canvas-wrapper">
+                <h3>Challenge Mode</h3>
+                <div class="canvas-container-inner">
+                    <button class="nav-arrow prev">❮</button>
+                    <canvas id="challengeCanvas"></canvas>
+                    <button class="nav-arrow next">❯</button>
+                </div>
+                <div class="canvas-overlay">
+                    <div class="image-info">
+                        <span class="image-filename">1.jpg</span>
+                        <span class="image-counter">1/5</span>
+                    </div>
+                    <h4>Challenge Mode</h4>
+                    <p>Test your urban planning skills with specific objectives and constraints</p>
+                </div>
+            </div>
+            <div class="canvas-wrapper">
+                <h3>Sandbox</h3>
+                <div class="canvas-container-inner">
+                    <button class="nav-arrow prev">❮</button>
+                    <canvas id="sandboxCanvas"></canvas>
+                    <button class="nav-arrow next">❯</button>
+                </div>
+                <div class="canvas-overlay">
+                    <div class="image-info">
+                        <span class="image-filename">Vertical Eco-Commercial Tower Under Strain.png</span>
+                        <span class="image-counter">1/3</span>
+                    </div>
+                    <h4>Sandbox</h4>
+                    <p>Build freely and experiment with different block combinations</p>
+                </div>
+            </div>
+            <div class="canvas-wrapper">
+                <h3>Story Mode</h3>
+                <div class="canvas-container-inner">
+                    <button class="nav-arrow prev">❮</button>
+                    <canvas id="tutorialCanvas"></canvas>
+                    <button class="nav-arrow next">❯</button>
+                </div>
+                <div class="canvas-overlay">
+                    <div class="image-info">
+                        <span class="image-filename">1.png</span>
+                        <span class="image-counter">1/5</span>
+                    </div>
+                    <h4>Tutorial (Story Mode)</h4>
+                    <p>Learn the basics through an engaging narrative experience</p>
+                </div>
+            </div>
         </div>
     </section>
-    <!-- Image Slider End -->
+    <!-- Game Mode Canvases End -->
 
     <header>
         <div class="container">
@@ -30,7 +73,8 @@
                         <li><a href="#academic-publications">Overview</a></li>
                         <li><a href="#ant-visualization">Bibliography</a></li>
                         <li><a href="#about">Research</a></li>
-                        <li><a href="http://localhost:8080/blockhood_simulation.html" target="_blank" onclick="window.open('http://localhost:8080/blockhood_simulation.html', '_blank'); return false;">Simulation</a></li>
+                        <li><a href="#" id="openSimulation">Simulation</a></li>
+                        <li><a href="#" id="openPoster">Poster</a></li>
                     </ul>
                 </nav>
             </div>
@@ -49,7 +93,6 @@
                     <div class="block">⚡</div>
                     <div class="block">💧</div>
                     <div class="block">🌱</div>
-                    <div class="block">🚗</div>
                     <div class="block">🌞</div>
                 </div>
             </div>
@@ -286,6 +329,1077 @@
     <div id="tooltip" class="tooltip"></div>
 
     <script src="slider.js"></script>
+    
+    <!-- Poster Modal -->
+    <div id="posterModal" class="modal">
+        <div class="modal-content">
+            <span class="close-poster">&times;</span>
+            <div class="poster-container">
+                <img src="pdf2png/Precedent-study-poster1-compressed/Precedent-study-poster1-compressed-1.png" alt="Research Poster" class="poster-image">
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulation Modal -->
+    <div id="simulationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="simulation-container">
+                <div class="ui-panel">
+                    <h3>🏗️ Block Types</h3>
+                    <button class="block-button" onclick="selectBlock('apartment')">
+                        <div class="block-icon" style="background: #95a5a6;">🏢</div>
+                        <span>Apartment</span>
+                    </button>
+                    <button class="block-button" onclick="selectBlock('tree')">
+                        <div class="block-icon" style="background: #27ae60;">🌳</div>
+                        <span>Tree</span>
+                    </button>
+                    <button class="block-button" onclick="selectBlock('solar')">
+                        <div class="block-icon" style="background: #f1c40f;">☀️</div>
+                        <span>Solar Panel</span>
+                    </button>
+                    <button class="block-button" onclick="selectBlock('water')">
+                        <div class="block-icon" style="background: #3498db;">💧</div>
+                        <span>Water Tank</span>
+                    </button>
+                    <button class="block-button" onclick="selectBlock('park')">
+                        <div class="block-icon" style="background: #2ecc71;">🌳</div>
+                        <span>Park</span>
+                    </button>
+                    
+                    <div class="stats">
+                        <h4>📊 Resources</h4>
+                        <div class="stat-line">
+                            <span>Energy:</span>
+                            <div class="resource-bar">
+                                <div id="energy-bar" class="resource-fill" style="width: 50%; background: #f1c40f;"></div>
+                            </div>
+                            <span id="energy-value">50</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Water:</span>
+                            <div class="resource-bar">
+                                <div id="water-bar" class="resource-fill" style="width: 50%; background: #3498db;"></div>
+                            </div>
+                            <span id="water-value">50</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Happiness:</span>
+                            <div class="resource-bar">
+                                <div id="happiness-bar" class="resource-fill" style="width: 50%; background: #e74c3c;"></div>
+                            </div>
+                            <span id="happiness-value">50</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="simulation-canvas"></div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* Game Mode Canvases */
+        .game-mode-section {
+            padding: 80px 0 40px; /* Added more top padding */
+            background: #000000; /* Changed to solid black */
+            margin-top: 20px; /* Additional margin for separation */
+            color: #ffffff; /* Ensure text is white for visibility */
+        }
+        
+        .canvas-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 350px; /* Increased height for controls */
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #0a0a0a; /* Darker black for canvas containers */
+        }
+        
+        .canvas-container-inner {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .canvas-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); /* Lighter shadow on hover for better visibility */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .canvas-wrapper h3 {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            margin: 0;
+            font-size: 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .canvas-wrapper canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+        
+        .canvas-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            color: white;
+            padding: 15px 20px;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        
+        .image-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .image-filename {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+        }
+        
+        .image-counter {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 60px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s ease, background 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-arrow.prev {
+            left: 0;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .nav-arrow.next {
+            right: 0;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .nav-arrow:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .canvas-wrapper:hover .nav-arrow {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-arrow {
+                opacity: 1;
+                width: 25px;
+                height: 50px;
+            }
+        }
+        
+        .canvas-overlay h4 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+        }
+        
+        .canvas-overlay p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 1024px) {
+            .canvas-wrapper {
+                max-width: 350px;
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .canvas-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .canvas-wrapper {
+                max-width: 100%;
+                height: 250px;
+            }
+        }
+        
+        /* Poster Modal Styles */
+        .poster-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .poster-image {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .close-poster {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #fff;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1002;
+            background: rgba(0, 0, 0, 0.7);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .close-poster:hover {
+            background: rgba(231, 76, 60, 0.9);
+            transform: rotate(90deg);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #2c3e50;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .close {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            color: #fff;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1002;
+            background: rgba(0, 0, 0, 0.7);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close:hover {
+            background: rgba(231, 76, 60, 0.9);
+            transform: rotate(90deg);
+        }
+        
+        #simulation-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(44, 62, 80, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #34495e;
+            width: 280px;
+            max-height: calc(100% - 40px);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .block-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px;
+            background: #34495e;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .block-button:hover {
+            background: #4a6741;
+            transform: translateY(-2px);
+        }
+        
+        .block-button.selected {
+            background: #27ae60;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+        }
+        
+        .block-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 6px 8px;
+            background: rgba(44, 62, 80, 0.6);
+            border-radius: 4px;
+        }
+        
+        .resource-bar {
+            width: 80px;
+            height: 8px;
+            background: #34495e;
+            border-radius: 4px;
+            margin-left: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .resource-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        #simulation-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .ui-panel {
+                width: calc(100% - 40px);
+                max-height: 200px;
+                top: auto;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+            }
+            
+            .close {
+                top: 10px;
+                right: 10px;
+                width: 36px;
+                height: 36px;
+                font-size: 28px;
+            }
+        }
+    </style>
+    
+    <script>
+        // Get the modals
+        const simModal = document.getElementById('simulationModal');
+        const posterModal = document.getElementById('posterModal');
+        const simBtn = document.getElementById('openSimulation');
+        const posterBtn = document.getElementById('openPoster');
+        const simClose = document.getElementsByClassName('close')[0];
+        const posterClose = document.getElementsByClassName('close-poster')[0];
+        
+        // When the user clicks the simulation button, open the modal 
+        simBtn.onclick = function(e) {
+            e.preventDefault();
+            simModal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            // Initialize or restart the simulation when opening the modal
+            if (typeof setup === 'function') {
+                setup();
+            }
+        }
+        
+        // When the user clicks the poster button, open the poster modal
+        posterBtn.onclick = function(e) {
+            e.preventDefault();
+            posterModal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        }
+        
+        // When the user clicks on (x) in simulation modal, close it
+        simClose.onclick = function() {
+            simModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Clean up the simulation when closing the modal
+            if (typeof remove === 'function') {
+                remove();
+            }
+        }
+        
+        // When the user clicks on (x) in poster modal, close it
+        posterClose.onclick = function() {
+            posterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // When the user clicks anywhere outside of a modal, close it
+        window.onclick = function(event) {
+            if (event.target == simModal) {
+                simModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                // Clean up the simulation when closing the modal
+                if (typeof remove === 'function') {
+                    remove();
+                }
+            } else if (event.target == posterModal) {
+                posterModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Simulation variables
+        let resources = {
+            energy: 50,
+            water: 50,
+            happiness: 50
+        };
+        
+        const blockTypes = {
+            apartment: {
+                name: 'Apartment',
+                color: '#95a5a6',
+                resources: {
+                    energy: -1,
+                    water: -1,
+                    happiness: 2
+                },
+                neighbors: 3
+            },
+            tree: {
+                name: 'Tree',
+                color: '#27ae60',
+                resources: {
+                    energy: 0,
+                    water: -1,
+                    happiness: 1,
+                    oxygen: 1
+                },
+                neighbors: 2
+            },
+            solar: {
+                name: 'Solar Panel',
+                color: '#f1c40f',
+                resources: {
+                    energy: 3,
+                    water: 0,
+                    happiness: 0
+                },
+                neighbors: 1
+            },
+            water: {
+                name: 'Water Tank',
+                color: '#3498db',
+                resources: {
+                    energy: -1,
+                    water: 4,
+                    happiness: 0
+                },
+                neighbors: 2
+            },
+            park: {
+                name: 'Park',
+                color: '#2ecc71',
+                resources: {
+                    energy: 0,
+                    water: -1,
+                    happiness: 3
+                },
+                neighbors: 4
+            }
+        };
+        
+        let grid = [];
+        const gridSize = 16;
+        const cellSize = 60;
+        let selectedBlock = null;
+        
+        // p5.js setup
+        function setup() {
+            const canvas = createCanvas(window.innerWidth, window.innerHeight);
+            canvas.parent('simulation-canvas');
+            angleMode(DEGREES);
+            
+            // Initialize grid
+            for (let i = 0; i < gridSize; i++) {
+                grid[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    grid[i][j] = null;
+                }
+            }
+            
+            // Add some initial blocks
+            grid[8][8] = { type: 'apartment', resources: { ...blockTypes.apartment.resources } };
+            grid[9][8] = { type: 'solar', resources: { ...blockTypes.solar.resources } };
+            grid[8][9] = { type: 'water', resources: { ...blockTypes.water.resources } };
+            grid[9][9] = { type: 'tree', resources: { ...blockTypes.tree.resources } };
+            
+            setInterval(updateResources, 2000); // Update resources every 2 seconds
+        }
+        
+        function draw() {
+            background(44, 62, 80);
+            
+            // Center the grid
+            const offsetX = (width - (gridSize * cellSize)) / 2;
+            const offsetY = (height - (gridSize * cellSize * 0.6)) / 2;
+            
+            // Draw grid
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const x = i * cellSize + offsetX;
+                    const y = j * cellSize * 0.6 + offsetY + (i % 2) * cellSize * 0.3;
+                    
+                    // Draw cell background
+                    fill(52, 73, 94);
+                    stroke(44, 62, 80);
+                    strokeWeight(1);
+                    
+                    beginShape();
+                    vertex(x, y + cellSize * 0.5);
+                    vertex(x + cellSize * 0.5, y + cellSize * 0.2);
+                    vertex(x + cellSize, y + cellSize * 0.5);
+                    vertex(x + cellSize * 0.5, y + cellSize * 0.8);
+                    endShape(CLOSE);
+                    
+                    // Draw block if exists
+                    if (grid[i][j]) {
+                        drawIsometricBlock(x, y, grid[i][j].type);
+                    }
+                }
+            }
+            
+            // Draw hover preview
+            const gridX = floor((mouseX - (width - gridSize * cellSize) / 2) / cellSize);
+            const gridY = floor((mouseY - (height - gridSize * cellSize * 0.6) / 2) / (cellSize * 0.6));
+            
+            if (selectedBlock && gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize) {
+                drawHoverPreview(gridX, gridY);
+            }
+            
+            // Draw resource flows
+            drawResourceFlows();
+        }
+        
+        function drawIsometricBlock(x, y, blockType) {
+            const block = blockTypes[blockType];
+            if (!block) return;
+            
+            // Draw block base
+            fill(block.color);
+            noStroke();
+            
+            beginShape();
+            vertex(x, y + cellSize * 0.5);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.2);
+            vertex(x + cellSize, y + cellSize * 0.5);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.8);
+            endShape(CLOSE);
+            
+            // Add some depth
+            fill(shadeColor(block.color, -20));
+            beginShape();
+            vertex(x, y + cellSize * 0.5);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.2);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.8);
+            endShape(CLOSE);
+            
+            // Add highlight
+            fill(255, 100);
+            beginShape();
+            vertex(x + cellSize * 0.5, y + cellSize * 0.2);
+            vertex(x + cellSize, y + cellSize * 0.5);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.8);
+            endShape(CLOSE);
+            
+            // Draw block icon
+            textSize(20);
+            textAlign(CENTER, CENTER);
+            fill(255);
+            text(block.emoji || '🏢', x + cellSize * 0.5, y + cellSize * 0.5);
+        }
+        
+        function shadeColor(color, percent) {
+            // Convert hex to RGB
+            let r = parseInt(color.substring(1, 3), 16);
+            let g = parseInt(color.substring(3, 5), 16);
+            let b = parseInt(color.substring(5, 7), 16);
+            
+            // Calculate tint or shade
+            r = Math.min(255, Math.max(0, r + (r * percent / 100)));
+            g = Math.min(255, Math.max(0, g + (g * percent / 100)));
+            b = Math.min(255, Math.max(0, b + (b * percent / 100)));
+            
+            // Convert back to hex
+            return '#' + [r, g, b].map(x => {
+                const hex = Math.round(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+        
+        function drawHoverPreview(gridX, gridY) {
+            if (!selectedBlock) return;
+            
+            const offsetX = (width - (gridSize * cellSize)) / 2;
+            const offsetY = (height - (gridSize * cellSize * 0.6)) / 2;
+            const x = gridX * cellSize + offsetX;
+            const y = gridY * cellSize * 0.6 + offsetY + (gridX % 2) * cellSize * 0.3;
+            
+            // Draw semi-transparent preview
+            fill(255, 255, 255, 100);
+            noStroke();
+            
+            beginShape();
+            vertex(x, y + cellSize * 0.5);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.2);
+            vertex(x + cellSize, y + cellSize * 0.5);
+            vertex(x + cellSize * 0.5, y + cellSize * 0.8);
+            endShape(CLOSE);
+        }
+        
+        function drawResourceFlows() {
+            const offsetX = (width - (gridSize * cellSize)) / 2;
+            const offsetY = (height - (gridSize * cellSize * 0.6)) / 2;
+            
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i] && grid[i][j]) {
+                        const x = i * cellSize + offsetX + cellSize * 0.5;
+                        const y = j * cellSize * 0.6 + offsetY + cellSize * 0.5 + (i % 2) * cellSize * 0.3;
+                        drawFlowConnections(x, y, i, j);
+                    }
+                }
+            }
+        }
+        
+        function drawFlowConnections(x, y, gridX, gridY) {
+            const directions = [
+                { dx: 1, dy: 0 },  // Right
+                { dx: -1, dy: 0 }, // Left
+                { dx: 0, dy: 1 },  // Down
+                { dx: 0, dy: -1 }   // Up
+            ];
+            
+            const block = grid[gridX][gridY];
+            if (!block) return;
+            
+            for (const dir of directions) {
+                const newX = gridX + dir.dx;
+                const newY = gridY + dir.dy;
+                
+                if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize && grid[newX][newY]) {
+                    const targetX = newX * cellSize + (width - gridSize * cellSize) / 2 + cellSize * 0.5;
+                    const targetY = newY * cellSize * 0.6 + (height - gridSize * cellSize * 0.6) / 2 + 
+                                  cellSize * 0.5 + (newX % 2) * cellSize * 0.3;
+                    
+                    // Draw resource flow line
+                    stroke(255, 200);
+                    strokeWeight(1);
+                    line(x, y, targetX, targetY);
+                    
+                    // Draw arrow head
+                    const angle = atan2(targetY - y, targetX - x);
+                    const arrowSize = 5;
+                    push();
+                    translate(targetX, targetY);
+                    rotate(angle - 90);
+                    noStroke();
+                    fill(255, 200);
+                    triangle(-arrowSize, 0, arrowSize, 0, 0, -arrowSize * 2);
+                    pop();
+                }
+            }
+        }
+        
+        function mousePressed() {
+            const gridX = floor((mouseX - (width - gridSize * cellSize) / 2) / cellSize);
+            const gridY = floor((mouseY - (height - gridSize * cellSize * 0.6) / 2) / (cellSize * 0.6));
+            
+            if (selectedBlock && gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize) {
+                if (!grid[gridX][gridY]) {
+                    grid[gridX][gridY] = { 
+                        type: selectedBlock, 
+                        resources: { ...blockTypes[selectedBlock].resources } 
+                    };
+                }
+            }
+        }
+        
+        function selectBlock(blockType) {
+            selectedBlock = blockType;
+            
+            // Update button states
+            document.querySelectorAll('.block-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+        
+        function updateResources() {
+            // Reset resources
+            resources = {
+                energy: 0,
+                water: 0,
+                happiness: 0
+            };
+            
+            // Calculate resources from all blocks
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i] && grid[i][j]) {
+                        const block = grid[i][j];
+                        for (const [resource, value] of Object.entries(block.resources)) {
+                            if (resources.hasOwnProperty(resource)) {
+                                resources[resource] += value;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Update UI
+            updateResourceBars();
+            
+            // Check for game over conditions
+            if (resources.energy <= 0 || resources.water <= 0 || resources.happiness <= 0) {
+                alert('Game Over! Your city has collapsed due to lack of resources.');
+                // Reset the game
+                setup();
+            }
+        }
+        
+        function updateResourceBars() {
+            // Update energy bar
+            const energyPercent = Math.max(0, Math.min(100, resources.energy + 50));
+            document.getElementById('energy-bar').style.width = energyPercent + '%';
+            document.getElementById('energy-value').textContent = Math.round(resources.energy + 50);
+            
+            // Update water bar
+            const waterPercent = Math.max(0, Math.min(100, resources.water + 50));
+            document.getElementById('water-bar').style.width = waterPercent + '%';
+            document.getElementById('water-value').textContent = Math.round(resources.water + 50);
+            
+            // Update happiness bar
+            const happinessPercent = Math.max(0, Math.min(100, resources.happiness + 50));
+            document.getElementById('happiness-bar').style.width = happinessPercent + '%';
+            document.getElementById('happiness-value').textContent = Math.round(resources.happiness + 50);
+        }
+        
+        // Handle window resize
+        function windowResized() {
+            resizeCanvas(window.innerWidth, window.innerHeight);
+        }
+    </script>
+    <script>
+        // Canvas setup for game mode previews
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas configurations
+            const canvasConfigs = {
+                challenge: {
+                    element: document.getElementById('challengeCanvas'),
+                    container: document.querySelector('.canvas-wrapper:nth-child(1)'),
+                    images: [],
+                    currentIndex: 0,
+                    filenames: ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'],
+                    path: 'Challenge%20Mode/'
+                },
+                sandbox: {
+                    element: document.getElementById('sandboxCanvas'),
+                    container: document.querySelector('.canvas-wrapper:nth-child(2)'),
+                    images: [],
+                    currentIndex: 0,
+                    filenames: [
+                        'Vertical Eco-Commercial Tower Under Strain.png',
+                        'Thriving Eco-Urban Environment.png',
+                        'Urban tower.png',
+                        'Eco-Urban.png',
+                        'dystopian.jpg'
+                    ],
+                    path: 'Sandbox/'
+                },
+                tutorial: {
+                    element: document.getElementById('tutorialCanvas'),
+                    container: document.querySelector('.canvas-wrapper:nth-child(3)'),
+                    images: [],
+                    currentIndex: 0,
+                    filenames: ['1.png', '2.png', '3.png', '4.png', '5.png'],
+                    path: 'Tutorial%20%28Story%20Mode%29/'
+                }
+            };
+            
+            // Initialize canvases
+            function initCanvases() {
+                Object.values(canvasConfigs).forEach(config => {
+                    const canvas = config.element;
+                    const container = canvas.closest('.canvas-container-inner');
+                    const width = container.offsetWidth;
+                    const height = 300;
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                });
+            }
+            // Load all images
+            function loadAllImages() {
+                const allPromises = [];
+                
+                Object.entries(canvasConfigs).forEach(([key, config]) => {
+                    config.filenames.forEach((filename, index) => {
+                        const img = new Image();
+                        img.src = `images/${config.path}${filename}`;
+                        
+                        const promise = new Promise((resolve) => {
+                            img.onload = () => {
+                                config.images.push({
+                                    element: img,
+                                    filename: filename
+                                });
+                                resolve();
+                            };
+                            img.onerror = resolve; // Continue even if some images fail to load
+                        });
+                        
+                        allPromises.push(promise);
+                    });
+                });
+                
+                return Promise.all(allPromises);
+            }
+            
+            // Draw image on canvas
+            function drawCanvas(config) {
+                const canvas = config.element;
+                const ctx = canvas.getContext('2d');
+                const imgData = config.images[config.currentIndex];
+                
+                if (!imgData) return;
+                
+                const img = imgData.element;
+                const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
+                const x = (canvas.width - img.width * ratio) / 2;
+                const y = (canvas.height - img.height * ratio) / 2;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw image
+                ctx.drawImage(img, x, y, img.width * ratio, img.height * ratio);
+                
+                // Update file info
+                updateFileInfo(config);
+            }
+            
+            // Update file info display
+            function updateFileInfo(config) {
+                const container = config.container;
+                const imgData = config.images[config.currentIndex];
+                if (!imgData) return;
+                
+                const filenameEl = container.querySelector('.image-filename');
+                const counterEl = container.querySelector('.image-counter');
+                
+                if (filenameEl) {
+                    filenameEl.textContent = imgData.filename;
+                }
+                if (counterEl) {
+                    counterEl.textContent = `${config.currentIndex + 1}/${config.images.length}`;
+                }
+            }
+            
+            // Navigate to next/previous image
+            function navigate(config, direction) {
+                if (direction === 'next') {
+                    config.currentIndex = (config.currentIndex + 1) % config.images.length;
+                } else {
+                    config.currentIndex = (config.currentIndex - 1 + config.images.length) % config.images.length;
+                }
+                drawCanvas(config);
+            }
+            
+            // Initialize navigation controls
+            function initNavigation() {
+                Object.entries(canvasConfigs).forEach(([key, config]) => {
+                    const container = config.container;
+                    const prevBtn = container.querySelector('.nav-arrow.prev');
+                    const nextBtn = container.querySelector('.nav-arrow.next');
+                    const canvas = config.element;
+                    
+                    // Arrow button navigation
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            navigate(config, 'prev');
+                        });
+                    }
+                    
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            navigate(config, 'next');
+                        });
+                    }
+                    
+                    // Click on canvas to go to next image
+                    canvas.addEventListener('click', (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        
+                        // If click is on left third, go previous, otherwise go next
+                        if (x < rect.width / 3) {
+                            navigate(config, 'prev');
+                        } else if (x > (rect.width / 3) * 2) {
+                            navigate(config, 'next');
+                        }
+                    });
+                    
+                    // Keyboard navigation
+                    container.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowLeft') {
+                            navigate(config, 'prev');
+                        } else if (e.key === 'ArrowRight') {
+                            navigate(config, 'next');
+                        }
+                    });
+                    
+                    // Make canvas focusable for keyboard navigation
+                    canvas.setAttribute('tabindex', '0');
+                });
+            }
+            
+            // Initialize everything
+            function init() {
+                initCanvases();
+                
+                loadAllImages().then(() => {
+                    // Draw initial state for all canvases
+                    Object.values(canvasConfigs).forEach(config => {
+                        drawCanvas(config);
+                    });
+                    
+                    // Initialize navigation
+                    initNavigation();
+                    
+                    // Start auto-cycling
+                    setInterval(() => {
+                        Object.values(canvasConfigs).forEach(config => {
+                            if (config.images.length > 0) {
+                                navigate(config, 'next');
+                            }
+                        });
+                    }, 5000);
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    initCanvases();
+                    Object.values(canvasConfigs).forEach(drawCanvas);
+                });
+            }
+            
+            // Start the application
+            init();
+        });
+    </script>
     <script src="script.js"></script>
     <script src="floating-blocks.js"></script>
 <link rel="stylesheet" href="slider.css">

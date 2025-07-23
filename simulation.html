@@ -1,10 +1,632 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block'hood Simulation</title>
-    <meta http-equiv="refresh" content="0; url=http://localhost:8080/blockhood_simulation.html">
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #2c3e50;
+            color: #ecf0f1;
+        }
+        .ui-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(52, 73, 94, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #34495e;
+            min-width: 250px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .block-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px;
+            background: #34495e;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .block-button:hover {
+            background: #4a6741;
+            transform: translateY(-2px);
+        }
+        .block-button.selected {
+            background: #27ae60;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+        }
+        .block-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .stats {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 6px 8px;
+            background: rgba(44, 62, 80, 0.6);
+            border-radius: 4px;
+        }
+        .resource-positive { color: #2ecc71; }
+        .resource-negative { color: #e74c3c; }
+        .resource-neutral { color: #95a5a6; }
+        .resource-bar {
+            width: 80px;
+            height: 8px;
+            background: #34495e;
+            border-radius: 4px;
+            margin-left: 8px;
+            overflow: hidden;
+        }
+        .resource-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        h3, h4 {
+            margin: 0 0 15px 0;
+            color: #ecf0f1;
+        }
+    </style>
 </head>
 <body>
-    <p>If you are not redirected automatically, <a href="http://localhost:8080/blockhood_simulation.html">click here</a>.</p>
+    <div class="ui-panel">
+        <h3>🏗️ Block Types</h3>
+        <button class="block-button" onclick="selectBlock('apartment')">
+            <div class="block-icon" style="background: #95a5a6;">🏢</div>
+            <span>Apartment</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('tree')">
+            <div class="block-icon" style="background: #27ae60;">🌳</div>
+            <span>Tree</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('solar')">
+            <div class="block-icon" style="background: #f1c40f;">☀️</div>
+            <span>Solar Panel</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('water')">
+            <div class="block-icon" style="background: #3498db;">💧</div>
+            <span>Water Tank</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('park')">
+            <div class="block-icon" style="background: #2ecc71;">🌿</div>
+            <span>Park</span>
+        </button>
+        <button class="block-button" onclick="selectBlock('delete')">
+            <div class="block-icon" style="background: #e74c3c;">🗑️</div>
+            <span>Delete Block</span>
+        </button>
+        
+        <div class="stats">
+            <h4>📊 Resources</h4>
+            <div id="resource-display">
+                <div class="stat-line">
+                    <span>Energy: <span id="energy" class="resource-positive">100</span></span>
+                    <div class="resource-bar">
+                        <div id="energy-bar" class="resource-fill" style="width: 100%; background: #f1c40f;"></div>
+                    </div>
+                </div>
+                <div class="stat-line">
+                    <span>Water: <span id="water" class="resource-positive">100</span></span>
+                    <div class="resource-bar">
+                        <div id="water-bar" class="resource-fill" style="width: 100%; background: #3498db;"></div>
+                    </div>
+                </div>
+                <div class="stat-line">
+                    <span>Oxygen: <span id="oxygen" class="resource-positive">100</span></span>
+                    <div class="resource-bar">
+                        <div id="oxygen-bar" class="resource-fill" style="width: 100%; background: #2ecc71;"></div>
+                    </div>
+                </div>
+                <div class="stat-line">
+                    <span>Happiness: <span id="happiness" class="resource-positive">100</span></span>
+                    <div class="resource-bar">
+                        <div id="happiness-bar" class="resource-fill" style="width: 100%; background: #9b59b6;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let grid = [];
+        let gridSize = 18;
+        let cellSize = 35;
+        let selectedBlock = 'apartment';
+        let resources = {
+            energy: 100,
+            water: 100,
+            oxygen: 100,
+            happiness: 100
+        };
+        
+        const blockTypes = {
+            apartment: {
+                name: 'Apartment',
+                emoji: '🏢',
+                color: '#95a5a6',
+                resources: {
+                    energy: -2,
+                    water: -1,
+                    oxygen: -1,
+                    happiness: 1
+                },
+                produces: {
+                    residents: 10
+                }
+            },
+            tree: {
+                name: 'Tree',
+                emoji: '🌳',
+                color: '#27ae60',
+                resources: {
+                    energy: 0,
+                    water: -1,
+                    oxygen: 3,
+                    happiness: 2
+                }
+            },
+            solar: {
+                name: 'Solar Panel',
+                emoji: '☀️',
+                color: '#f1c40f',
+                resources: {
+                    energy: 5,
+                    water: 0,
+                    oxygen: 0,
+                    happiness: 0
+                }
+            },
+            water: {
+                name: 'Water Tank',
+                emoji: '💧',
+                color: '#3498db',
+                resources: {
+                    energy: -1,
+                    water: 5,
+                    oxygen: 0,
+                    happiness: 0
+                }
+            },
+            park: {
+                name: 'Park',
+                emoji: '🌿',
+                color: '#2ecc71',
+                resources: {
+                    energy: 0,
+                    water: -1,
+                    oxygen: 1,
+                    happiness: 4
+                }
+            }
+        };
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            angleMode(DEGREES);
+            
+            // Initialize grid
+            for (let i = 0; i < gridSize; i++) {
+                grid[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    grid[i][j] = null;
+                }
+            }
+            
+            // Add some initial blocks
+            grid[8][8] = { type: 'apartment', resources: { ...blockTypes.apartment.resources } };
+            grid[9][8] = { type: 'solar', resources: { ...blockTypes.solar.resources } };
+            grid[8][9] = { type: 'water', resources: { ...blockTypes.water.resources } };
+            grid[9][9] = { type: 'tree', resources: { ...blockTypes.tree.resources } };
+            
+            setInterval(updateResources, 2000); // Update resources every 2 seconds
+        }
+
+        function draw() {
+            background(44, 62, 80);
+            
+            // Center the grid
+            const offsetX = (width - (gridSize * cellSize)) / 2;
+            const offsetY = (height - (gridSize * cellSize * 0.6)) / 2;
+            
+            // Draw grid
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const x = i * cellSize + offsetX;
+                    const y = j * cellSize * 0.6 + offsetY + (i % 2) * cellSize * 0.3;
+                    
+                    // Draw cell background
+                    fill(52, 73, 94);
+                    stroke(44, 62, 80);
+                    strokeWeight(1);
+                    
+                    beginShape();
+                    vertex(x, y + cellSize * 0.5);
+                    vertex(x + cellSize * 0.5, y + cellSize * 0.2);
+                    vertex(x + cellSize, y + cellSize * 0.5);
+                    vertex(x + cellSize * 0.5, y + cellSize * 0.8);
+                    endShape(CLOSE);
+                    
+                    // Draw block if exists
+                    if (grid[i][j]) {
+                        drawIsometricBlock(x, y, grid[i][j].type);
+                    }
+                }
+            }
+            
+            // Draw hover preview
+            const gridX = floor((mouseX - (width - gridSize * cellSize) / 2) / cellSize);
+            const gridY = floor((mouseY - (height - gridSize * cellSize * 0.6) / 2) / (cellSize * 0.6));
+            
+            if (gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize) {
+                drawHoverPreview(gridX, gridY);
+            }
+            
+            // Draw resource flows
+            drawResourceFlows();
+        }
+
+        function drawIsometricBlock(x, y, blockType) {
+            const block = blockTypes[blockType];
+            if (!block) return;
+            
+            // Base
+            fill(block.color);
+            stroke(44, 62, 80);
+            strokeWeight(1);
+            
+            push();
+            translate(x + cellSize * 0.5, y + cellSize * 0.5);
+            
+            // 3D effect
+            // Front face
+            fill(block.color);
+            beginShape();
+            vertex(-cellSize * 0.4, -cellSize * 0.15);
+            vertex(0, -cellSize * 0.3);
+            vertex(cellSize * 0.4, -cellSize * 0.15);
+            vertex(0, 0);
+            endShape(CLOSE);
+            
+            // Side face (darker)
+            fill(shadeColor(block.color, -20));
+            beginShape();
+            vertex(cellSize * 0.4, -cellSize * 0.15);
+            vertex(cellSize * 0.4, cellSize * 0.15);
+            vertex(0, cellSize * 0.3);
+            vertex(0, 0);
+            endShape(CLOSE);
+            
+            // Top face (lighter)
+            fill(shadeColor(block.color, 20));
+            beginShape();
+            vertex(-cellSize * 0.4, -cellSize * 0.15);
+            vertex(0, -cellSize * 0.3);
+            vertex(0, 0);
+            vertex(-cellSize * 0.4, cellSize * 0.15);
+            vertex(-cellSize * 0.4, -cellSize * 0.15);
+            endShape(CLOSE);
+            
+            // Emoji
+            textSize(cellSize * 0.5);
+            textAlign(CENTER, CENTER);
+            fill(255);
+            text(block.emoji, 0, 0);
+            
+            pop();
+            
+            // Draw resource indicators
+            drawResourceIndicators(x + cellSize * 0.5, y + cellSize * 0.5, cellSize * 0.8, blockType);
+        }
+
+        function shadeColor(color, percent) {
+            let R = parseInt(color.substring(1,3), 16);
+            let G = parseInt(color.substring(3,5), 16);
+            let B = parseInt(color.substring(5,7), 16);
+
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+
+            R = (R<255)?R:255;  
+            G = (G<255)?G:255;  
+            B = (B<255)?B:255;  
+
+            R = Math.round(R);
+            G = Math.round(G);
+            B = Math.round(B);
+
+            const RR = ((R.toString(16).length==1) ? "0"+R.toString(16):R.toString(16));
+            const GG = ((G.toString(16).length==1) ? "0"+G.toString(16):G.toString(16));
+            const BB = ((B.toString(16).length==1) ? "0"+B.toString(16):B.toString(16));
+
+            return "#"+RR+GG+BB;
+        }
+
+        function drawHoverPreview(gridX, gridY) {
+            if (selectedBlock === 'delete') return;
+            
+            const offsetX = (width - (gridSize * cellSize)) / 2;
+            const offsetY = (height - (gridSize * cellSize * 0.6)) / 2;
+            const x = gridX * cellSize + offsetX;
+            const y = gridY * cellSize * 0.6 + offsetY + (gridX % 2) * cellSize * 0.3;
+            
+            // Only show preview on empty cells
+            if (grid[gridX][gridY]) return;
+            
+            // Draw semi-transparent preview
+            push();
+            translate(x + cellSize * 0.5, y + cellSize * 0.5);
+            
+            const block = blockTypes[selectedBlock];
+            fill(block.color + '80'); // 50% opacity
+            noStroke();
+            
+            beginShape();
+            vertex(-cellSize * 0.4, -cellSize * 0.15);
+            vertex(0, -cellSize * 0.3);
+            vertex(cellSize * 0.4, -cellSize * 0.15);
+            vertex(0, 0);
+            endShape(CLOSE);
+            
+            // Emoji
+            textSize(cellSize * 0.5);
+            textAlign(CENTER, CENTER);
+            fill(255, 200);
+            text(block.emoji, 0, 0);
+            
+            pop();
+        }
+
+        function drawResourceIndicators(px, py, size, blockType) {
+            const block = blockTypes[blockType];
+            if (!block || !block.resources) return;
+            
+            const indicators = [];
+            
+            // Add resource indicators
+            for (const [resource, value] of Object.entries(block.resources)) {
+                if (value !== 0) {
+                    indicators.push({
+                        type: resource,
+                        value: value,
+                        color: getResourceColor(resource)
+                    });
+                }
+            }
+            
+            // Position indicators in a circle around the block
+            const radius = size * 0.6;
+            const angleStep = 360 / Math.max(1, indicators.length);
+            
+            push();
+            translate(px, py);
+            
+            indicators.forEach((indicator, index) => {
+                const angle = radians(index * angleStep - 90);
+                const x = cos(angle) * radius;
+                const y = sin(angle) * radius;
+                
+                // Draw indicator
+                noStroke();
+                fill(indicator.color);
+                circle(x, y, size * 0.3);
+                
+                // Draw + or -
+                fill(255);
+                textSize(size * 0.2);
+                textAlign(CENTER, CENTER);
+                text(indicator.value > 0 ? '+' : '-', x, y);
+            });
+            
+            pop();
+        }
+
+        function getResourceColor(resource) {
+            const colors = {
+                energy: '#f1c40f',
+                water: '#3498db',
+                oxygen: '#2ecc71',
+                happiness: '#9b59b6'
+            };
+            return colors[resource] || '#95a5a6';
+        }
+
+        function drawResourceFlows() {
+            const offsetX = (width - (gridSize * cellSize)) / 2;
+            const offsetY = (height - (gridSize * cellSize * 0.6)) / 2;
+            
+            // Draw connections between adjacent blocks
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i][j]) {
+                        const x = i * cellSize + offsetX + cellSize * 0.5;
+                        const y = j * cellSize * 0.6 + offsetY + (i % 2) * cellSize * 0.3 + cellSize * 0.5;
+                        drawFlowConnections(x, y, i, j);
+                    }
+                }
+            }
+        }
+
+        function drawFlowConnections(x, y, gridX, gridY) {
+            const directions = [
+                { dx: 1, dy: 0 },   // right
+                { dx: -1, dy: 0 },  // left
+                { dx: 0, dy: 1 },   // down
+                { dx: 0, dy: -1 }   // up
+            ];
+            
+            directions.forEach(dir => {
+                const newX = gridX + dir.dx;
+                const newY = gridY + dir.dy;
+                
+                if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize && grid[newX][newY]) {
+                    const targetX = newX * cellSize + (width - gridSize * cellSize) / 2 + cellSize * 0.5;
+                    const targetY = newY * cellSize * 0.6 + (height - gridSize * cellSize * 0.6) / 2 + 
+                                  (newX % 2) * cellSize * 0.3 + cellSize * 0.5;
+                    
+                    // Only draw flow if there's a resource exchange
+                    if (grid[gridX][gridY].resources && grid[newX][newY].resources) {
+                        // Check if any resource flows between these blocks
+                        for (const [resource, value] of Object.entries(grid[gridX][gridY].resources)) {
+                            if (value !== 0) {
+                                const flowValue = Math.min(5, Math.abs(value));
+                                const alpha = map(flowValue, 0, 5, 50, 200);
+                                const color = getResourceColor(resource) + alpha.toString(16).padStart(2, '0');
+                                drawFlowLine(x, y, targetX, targetY, color);
+                                break; // Only draw one flow line per connection
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function drawFlowLine(x1, y1, x2, y2, color) {
+            // Add some randomness to make it look more organic
+            const midX = (x1 + x2) / 2 + random(-10, 10);
+            const midY = (y1 + y2) / 2 + random(-10, 10);
+            
+            // Draw a curved line
+            noFill();
+            stroke(color);
+            strokeWeight(1);
+            
+            beginShape();
+            vertex(x1, y1);
+            quadraticVertex(midX, midY, x2, y2);
+            endShape();
+            
+            // Add pulsing dots along the line
+            const steps = 5;
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const x = bezierPoint(x1, midX, midX, x2, t);
+                const y = bezierPoint(y1, midY, midY, y2, t);
+                
+                // Make dots pulse with sin wave
+                const pulse = sin(frameCount * 0.1 + i) * 0.5 + 1.5;
+                fill(color);
+                noStroke();
+                circle(x, y, 2 * pulse);
+            }
+        }
+
+        function mousePressed() {
+            const gridX = floor((mouseX - (width - gridSize * cellSize) / 2) / cellSize);
+            const gridY = floor((mouseY - (height - gridSize * cellSize * 0.6) / 2) / (cellSize * 0.6));
+            
+            if (gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize) {
+                if (selectedBlock === 'delete') {
+                    // Delete block
+                    grid[gridX][gridY] = null;
+                } else if (!grid[gridX][gridY]) {
+                    // Add new block
+                    grid[gridX][gridY] = { 
+                        type: selectedBlock, 
+                        resources: { ...blockTypes[selectedBlock].resources } 
+                    };
+                }
+            }
+        }
+
+        function selectBlock(blockType) {
+            selectedBlock = blockType;
+            
+            // Update button styles
+            document.querySelectorAll('.block-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function updateResources() {
+            // Reset resource deltas
+            const deltas = {
+                energy: 0,
+                water: 0,
+                oxygen: 0,
+                happiness: 0
+            };
+            
+            // Calculate resource changes from all blocks
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const block = grid[i][j];
+                    if (block && block.resources) {
+                        for (const [resource, value] of Object.entries(block.resources)) {
+                            deltas[resource] = (deltas[resource] || 0) + value;
+                        }
+                    }
+                }
+            }
+            
+            // Apply changes with limits
+            for (const [resource, delta] of Object.entries(deltas)) {
+                resources[resource] += delta;
+                resources[resource] = constrain(resources[resource], 0, 200);
+                
+                // Update UI
+                const element = document.getElementById(resource);
+                const bar = document.getElementById(`${resource}-bar`);
+                if (element && bar) {
+                    element.textContent = Math.round(resources[resource]);
+                    const percentage = (resources[resource] / 200) * 100;
+                    bar.style.width = `${percentage}%`;
+                    
+                    // Update color based on level
+                    if (resources[resource] < 30) {
+                        element.className = 'resource-negative';
+                        bar.style.background = '#e74c3c';
+                    } else if (resources[resource] < 70) {
+                        element.className = 'resource-neutral';
+                        bar.style.background = '#f39c12';
+                    } else {
+                        element.className = 'resource-positive';
+                        bar.style.background = getResourceColor(resource);
+                    }
+                }
+            }
+            
+            // Check for game over conditions
+            if (resources.energy <= 0 || resources.water <= 0 || resources.oxygen <= 0) {
+                alert('Game Over! Your neighborhood has collapsed due to lack of essential resources.');
+                // Reset game
+                resources = {
+                    energy: 100,
+                    water: 100,
+                    oxygen: 100,
+                    happiness: 100
+                };
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            // Set initial selected button
+            document.querySelector('.block-button').classList.add('selected');
+        };
+    </script>
 </body>
 </html>
